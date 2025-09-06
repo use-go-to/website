@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
                             <section class="section"><h2>${data.contact.pageTitle}</h2><p style="text-align:center; max-width:700px; margin: 0 auto 40px;">${data.contact.introText}</p>
-                                <form action="https://formsubmit.co/${data.contact.email}" method="POST" style="max-width: 600px; margin: auto;"><input type="text" name="name" placeholder="Votre Nom" required><input type="email" name="email" placeholder="Votre E-mail" required><textarea name="message" rows="5" placeholder="Votre Message" required></textarea><button type="submit" class="btn">Envoyer</button></form>
+                                <form action="https://formsubmit.co/${data.contact.email}" method="POST" style="max-width: 600px; margin: auto;"><input type="hidden" name="_subject" value="Nouveau message depuis ${data.general.siteTitle}"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_template" value="table"><input type="text" name="name" placeholder="Votre Nom" required><input type="email" name="email" placeholder="Votre E-mail" required><textarea name="message" rows="5" placeholder="Votre Message" required></textarea><button type="submit" class="btn">Envoyer</button></form>
                             </section>
                         </div>
                     </main>
@@ -276,7 +276,9 @@ document.addEventListener('DOMContentLoaded', () => {
                              <section class="section"><h2>${data.catalogue.pageTitle}</h2><div class="card-grid">${data.catalogue.items.map(i => `<div class="card catalog-item"><h3>${i.name}</h3><p>${i.desc}</p>${i.price ? `<b style="color:var(--color-accent)">${i.price}</b>` : ''}</div>`).join('')}</div></section>
                         </div>
                         <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
-                            <section class="section"><h2>${data.contact.pageTitle}</h2><p style="text-align:center;">${data.contact.introText}</p></section>
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><p style="text-align:center; max-width:700px; margin: 0 auto 40px;">${data.contact.introText}</p>
+                                <form action="https://formsubmit.co/${data.contact.email}" method="POST" style="max-width: 600px; margin: auto;"><input type="hidden" name="_subject" value="Nouveau message depuis ${data.general.siteTitle}"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_template" value="table"><input type="text" name="name" placeholder="Votre Nom" required><input type="email" name="email" placeholder="Votre E-mail" required><textarea name="message" rows="5" placeholder="Votre Message" required></textarea><button type="submit" class="btn">Envoyer</button></form>
+                            </section>
                         </div>
                     </main>
                     <footer><p>${data.contact.footerText}</p></footer>
@@ -301,7 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                          <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
                             <section class="section"><h2>${data.accueil.aboutTitle}</h2><p style="text-align:center;">${data.accueil.aboutText}</p></section>
-                            <section class="section section-alt"><h2>Contact</h2><p style="text-align:center;">${data.contact.email} | ${data.contact.phone}</p></section>
+                            <section class="section section-alt"><h2>Contact</h2><p style="text-align:center; margin-bottom: 30px;">${data.contact.email} | ${data.contact.phone}</p>
+                                <form action="https://formsubmit.co/${data.contact.email}" method="POST" style="max-width: 500px; margin: auto;"><input type="hidden" name="_subject" value="Nouveau message depuis ${data.general.siteTitle}"><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_template" value="table"><input type="text" name="name" placeholder="Votre Nom" required style="margin-bottom: 15px; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 5px;"><input type="email" name="email" placeholder="Votre E-mail" required style="margin-bottom: 15px; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 5px;"><textarea name="message" rows="4" placeholder="Votre Message" required style="margin-bottom: 15px; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 5px; resize: vertical;"></textarea><button type="submit" class="btn">Envoyer</button></form>
+                            </section>
                         </div>
                     </main>
                     <footer><p>${data.contact.footerText}</p></footer>
@@ -554,6 +558,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if(navLinks.length > 0) {
                  showPage(navLinks[0].dataset.page);
             }
+            // Handle form submissions
+            const forms = document.querySelectorAll('form[action*="formsubmit.co"]');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.textContent = 'Envoi en cours...';
+                        submitBtn.disabled = true;
+                    }
+                });
+            });
         });
     <\/script>
 </body></html>`;
