@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Créateur de Site PRO v4</title>
+<title>Créateur de Site PRO v3</title>
 <style id="main-styles">
     :root {
         --color-accent: #007bff; --color-heading: #212529; --color-hero-title: #ffffff; --color-hero-subtitle: #2c3e50; --color-text: #343a40; --color-bg: #ffffff; --color-surface: #f8f9fa;
@@ -18,7 +18,7 @@
     body { font-family: var(--font-main); background-color: #eef1f3; color: #333; line-height: 1.6; }
     .container { display: flex; height: 100vh; }
     .customizer { width: 420px; background: #fff; padding: 25px; box-shadow: var(--shadow-md); overflow-y: auto; display: flex; flex-direction: column; z-index: 10; }
-    .customizer h2 { margin-bottom: 20px; border-bottom: 2px solid var(--color-accent); padding-bottom: 10px; color: #99e0ff; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+    .customizer h2 { margin-bottom: 20px; border-bottom: 2px solid var(--color-accent); padding-bottom: 10px; color: black; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
     .form-group { margin-bottom: 18px; }
     .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #34495e; font-size: 0.9rem; }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: inherit; transition: border-color 0.3s; background: #fdfdfd; font-size: 1rem; }
@@ -167,11 +167,7 @@
         <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
         <h3>Demander un module ou une modification</h3>
         <p style="font-size:0.9rem; margin-bottom:15px; color: #555;">Décrivez votre besoin. Votre configuration actuelle sera jointe automatiquement à votre demande pour nous donner le contexte.</p>
-        <form id="featureRequestForm" action="https://formsubmit.co/school.dlecointre@gmail.com" method="POST">
-            <input type="hidden" name="_subject" value="Nouvelle demande d'ajout !">
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_autoresponse" value="Merci pour votre demande ! Nous l'étudierons et vous répondrons rapidement.">
+        <form id="featureRequestForm">
             <div class="form-group">
                 <label for="featureName">Nom du module / de la modification</label>
                 <input type="text" id="featureName" name="nom_de_la_demande" placeholder="Ex: Page Blog, Section 'Notre équipe'..." required>
@@ -180,7 +176,6 @@
                 <label for="featureDetails">Détails de votre demande</label>
                 <textarea id="featureDetails" name="details_demande" placeholder="Décrivez le plus précisément possible ce que vous souhaitez." required></textarea>
             </div>
-            <input type="hidden" name="configuration_json" id="jsonConfigInput">
             
             <button type="submit" class="btn">Envoyer la demande</button>
         </form>
@@ -299,10 +294,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <input type="hidden" name="_captcha" value="false">
                                             <input type="hidden" name="_template" value="table">
                                             <input type="hidden" name="_autoresponse" value="Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.">
-                                            <div style="margin-bottom:15px;"><input type="text" name="name" placeholder="Votre Nom" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:5px;"></div>
-                                            <div style="margin-bottom:15px;"><input type="email" name="email" placeholder="Votre E-mail" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:5px;"></div>
-                                            <div style="margin-bottom:15px;"><input type="tel" name="phone" placeholder="Votre Téléphone" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:5px;"></div>
-                                            <div style="margin-bottom:15px;"><textarea name="message" rows="5" placeholder="Votre Message" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:5px; resize:vertical;"></textarea></div>
+                                            <input type="text" name="name" placeholder="Votre Nom" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="email" name="email" placeholder="Votre E-mail" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="tel" name="phone" placeholder="Votre Téléphone" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <textarea name="message" rows="5" placeholder="Votre Message" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; resize:vertical;"></textarea>
                                             <button type="submit" class="btn">Envoyer le message</button>
                                         </form>
                                     </div>
@@ -320,6 +315,137 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </main>
                     <footer><div class="social-links">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" aria-label="${k}"><i class="fab fa-${k}"></i></a>`).join('')}</div><p>${data.contact.footerText}</p></footer>
+                </div>`
+        },
+        'corporate': {
+            name: 'Corporate Moderne',
+            defaults: { colorAccent: '#0052CC', colorHeading: '#172B4D', colorText: '#42526E', colorBg: '#FFFFFF', colorSurface: '#F4F5F7' },
+            render: (data, activePage) => `
+                <div class="template-corporate">
+                    <header>
+                        <div class="logo">${data.general.siteTitle}</div>
+                        <nav><ul>
+                            <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Accueil</a></li>
+                            <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Services</a></li>
+                            <li><a href="#apropos" data-page="apropos" class="${activePage === 'apropos' ? 'active' : ''}">À Propos</a></li>
+                            <li><a href="#galerie" data-page="galerie" class="${activePage === 'galerie' ? 'active' : ''}">Réalisations</a></li>
+                            <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Contact</a></li>
+                        </ul></nav>
+                    </header>
+                    <main>
+                        <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
+                            <section class="hero">
+                                <div class="hero-text"><h1>${data.accueil.heroTitle}</h1><p>${data.accueil.heroSubtitle}</p><a href="${data.accueil.ctaLink}" class="btn cta-btn">${data.accueil.ctaText}</a></div>
+                                <img class="hero-image" src="${data.accueil.heroImage}" alt="Hero Image">
+                            </section>
+                            <section class="section"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
+                            <section class="section section-alt"><h2>${data.temoignages.title}</h2><p style="text-align:center; margin-bottom:40px;">${data.temoignages.intro}</p><div class="card-grid">${data.temoignages.items.map(t => `<div class="card"><p>"${t.text}"</p><b>- ${t.author}<br><small>${t.company}</small></b></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'services' ? 'active' : ''}" id="page-services">
+                             <section class="section"><h2>${data.services.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.services.intro}</p><div class="card-grid">${data.services.items.map(i => `<div class="card catalog-item"><h3>${i.name}</h3><p>${i.desc}</p><ul style="margin:15px 0;">${i.features.map(f => `<li>${f}</li>`).join('')}</ul><b style="color:var(--color-accent)">${i.price}</b></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'apropos' ? 'active' : ''}" id="page-apropos">
+                            <section class="section"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto 40px; font-size:1.1rem;">${data.apropos.text}</p>
+                                <div class="features-grid">
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-bullseye"></i></div><h3>Notre Mission</h3><p>${data.apropos.mission}</p></div>
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-eye"></i></div><h3>Notre Vision</h3><p>${data.apropos.vision}</p></div>
+                                </div>
+                                <div style="text-align:center; margin-top:40px;"><h3>Nos Valeurs</h3><div style="display:flex; justify-content:center; gap:30px; margin-top:20px; flex-wrap:wrap;">${data.apropos.values.map(v => `<span style="background:var(--color-accent); color:white; padding:10px 20px; border-radius:25px;">${v}</span>`).join('')}</div></div>
+                            </section>
+                        </div>
+                        <div class="page-content ${activePage === 'galerie' ? 'active' : ''}" id="page-galerie">
+                            <section class="section"><h2>${data.galerie.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.galerie.intro}</p><div class="gallery-grid">${data.galerie.images.map(i => `<figure class="gallery-item"><img src="${i.url}" alt="${i.caption}"><figcaption>${i.caption}</figcaption></figure>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><p style="text-align:center; max-width:700px; margin: 0 auto 40px;">${data.contact.introText}</p>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:1000px; margin:0 auto;">
+                                    <div>
+                                        <h3>${data.contact.formTitle}</h3>
+                                        <form action="https://formsubmit.co/${data.general.email}" method="POST" style="margin-top:20px;">
+                                            <input type="hidden" name="_subject" value="Nouveau message depuis ${data.general.siteTitle}">
+                                            <input type="hidden" name="_captcha" value="false">
+                                            <input type="hidden" name="_template" value="table">
+                                            <input type="hidden" name="_autoresponse" value="Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.">
+                                            <input type="text" name="name" placeholder="Votre Nom" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="email" name="email" placeholder="Votre E-mail" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="tel" name="phone" placeholder="Votre Téléphone" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <textarea name="message" rows="5" placeholder="Votre Message" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; resize:vertical;"></textarea>
+                                            <button type="submit" class="btn">Envoyer le message</button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <h3>Nos Coordonnées</h3>
+                                        <div style="margin-top:20px;">
+                                            <p style="margin-bottom:15px;"><i class="fas fa-map-marker-alt" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.address}</p>
+                                            <p style="margin-bottom:15px;"><i class="fas fa-phone" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.phone}</p>
+                                            <p style="margin-bottom:15px;"><i class="fas fa-envelope" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.email}</p>
+                                            <p style="margin-bottom:15px;"><i class="fas fa-clock" style="color:var(--color-accent); margin-right:10px;"></i>${data.contact.horaires}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </main>
+                    <footer><div class="social-links">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" aria-label="${k}"><i class="fab fa-${k}"></i></a>`).join('')}</div><p>${data.contact.footerText}</p></footer>
+                </div>`
+        },
+        'portfolio': {
+            name: 'Portfolio Créatif',
+            defaults: { colorAccent: '#E91E63', colorHeading: '#212121', colorText: '#616161', colorBg: '#FFFFFF', colorSurface: '#FAFAFA' },
+            render: (data, activePage) => `
+                <div class="template-portfolio">
+                     <header>
+                        <div class="logo">${data.general.siteTitle}</div>
+                        <div class="subtext">${data.general.headerSubtext}</div>
+                    </header>
+                    <nav><ul>
+                        <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Portfolio</a></li>
+                        <li><a href="#apropos" data-page="apropos" class="${activePage === 'apropos' ? 'active' : ''}">À Propos</a></li>
+                        <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Services</a></li>
+                        <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Contact</a></li>
+                    </ul></nav>
+                    <main>
+                         <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
+                            <section class="section"><h2>${data.galerie.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.galerie.intro}</p><div class="gallery-grid">${data.galerie.images.map(i => `<figure class="gallery-item"><img src="${i.url}" alt="${i.caption}"><figcaption>${i.caption}</figcaption></figure>`).join('')}</div></section>
+                            <section class="section section-alt"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'apropos' ? 'active' : ''}" id="page-apropos">
+                            <section class="section"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto 40px;">${data.apropos.text}</p>
+                                <div class="features-grid">
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-palette"></i></div><h3>Créativité</h3><p>${data.apropos.mission}</p></div>
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-lightbulb"></i></div><h3>Innovation</h3><p>${data.apropos.vision}</p></div>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="page-content ${activePage === 'services' ? 'active' : ''}" id="page-services">
+                             <section class="section"><h2>${data.services.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.services.intro}</p><div class="card-grid">${data.services.items.map(i => `<div class="card catalog-item"><h3>${i.name}</h3><p>${i.desc}</p><ul style="margin:15px 0;">${i.features.map(f => `<li>${f}</li>`).join('')}</ul><b style="color:var(--color-accent)">${i.price}</b></div>`).join('')}</div></section>
+                        </div>
+                         <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.contact.introText}</p>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:1000px; margin:0 auto;">
+                                    <div>
+                                        <form action="https://formsubmit.co/${data.general.email}" method="POST">
+                                            <input type="hidden" name="_subject" value="Nouveau message depuis ${data.general.siteTitle}">
+                                            <input type="hidden" name="_captcha" value="false">
+                                            <input type="hidden" name="_template" value="table">
+                                            <input type="hidden" name="_autoresponse" value="Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.">
+                                            <input type="text" name="name" placeholder="Votre Nom" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="email" name="email" placeholder="Votre E-mail" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <textarea name="message" rows="4" placeholder="Votre Message" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; resize:vertical;"></textarea>
+                                            <button type="submit" class="btn">Envoyer</button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <h3>Contact</h3>
+                                        <p style="margin:20px 0;"><i class="fas fa-envelope" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.email}</p>
+                                        <p style="margin:20px 0;"><i class="fas fa-phone" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.phone}</p>
+                                        <div class="social-links" style="margin-top:30px;">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" style="color:var(--color-accent); font-size:1.5rem; margin-right:15px;"><i class="fab fa-${k}"></i></a>`).join('')}</div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </main>
+                    <footer><p>${data.contact.footerText}</p></footer>
                 </div>`
         }
     };
@@ -344,6 +470,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (path.startsWith('general.color') || path === 'general.theme') applyTheme();
         renderPreview(currentPreviewPage);
+    };
+    
+    const updateTabsForTemplate = (templateId) => {
+        const tabsContainer = document.getElementById('tabsContainer');
+        const accueilTab = tabsContainer.querySelector('[data-page="accueil"]');
+        
+        if (templateId === 'portfolio') {
+            accueilTab.textContent = 'Portfolio';
+        } else {
+            accueilTab.textContent = 'Accueil';
+        }
+        
+        // Refresh DOM.tabs reference
+        DOM.tabs = document.querySelectorAll('.tab-btn');
     };
     
     const switchTab = (page) => {
@@ -396,6 +536,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const templateChoices = Object.keys(templates).map(id => ({ value: id, text: templates[id].name }));
                 addField('general.templateId', 'Template du Site', 'select', { choices: templateChoices });
                 
+                const templateSelect = fragment.querySelector('#general\\.templateId');
+                if (templateSelect) {
+                    templateSelect.addEventListener('change', (e) => {
+                        const template = templates[e.target.value];
+                        if (template) {
+                            websiteData.general.templateId = e.target.value;
+                            Object.assign(websiteData.general, template.defaults);
+                            updateTabsForTemplate(e.target.value);
+                            applyTheme();
+                            renderPreview(currentPreviewPage);
+                            renderCustomizerForm(currentCustomizerPage);
+                        }
+                    });
+                }
+                
                 addField('general.siteTitle', 'Nom de l\'entreprise'); 
                 addField('general.headerSubtext', 'Slogan / Baseline');
                 addField('general.phone', 'Téléphone'); 
@@ -412,17 +567,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 addField('general.colorSurface', 'Surfaces', 'color');
                 break;
             case 'accueil':
-                addField('accueil.heroTitle', 'Titre principal'); 
-                addField('accueil.heroSubtitle', 'Sous-titre', 'textarea'); 
-                addField('accueil.heroImage', 'Image de fond (URL)');
-                addField('accueil.ctaText', 'Texte du bouton'); 
-                addField('accueil.ctaLink', 'Lien du bouton');
-                addDivider();
-                addSubheading('Statistiques');
-                websiteData.accueil.stats.forEach((_, i) => {
-                    addField(`accueil.stats.${i}.number`, `Chiffre ${i + 1}`);
-                    addField(`accueil.stats.${i}.label`, `Label ${i + 1}`);
-                });
+                if (websiteData.general.templateId === 'portfolio') {
+                    // Pour le template portfolio, on configure la galerie
+                    addField('galerie.pageTitle', 'Titre du portfolio');
+                    addField('galerie.intro', 'Texte d\'introduction', 'textarea');
+                    websiteData.galerie.images.forEach((_, i) => { 
+                        addDivider(); addSubheading(`Réalisation ${i + 1}`);
+                        addField(`galerie.images.${i}.url`, 'Image (URL)'); 
+                        addField(`galerie.images.${i}.caption`, 'Description');
+                    });
+                } else {
+                    // Pour les autres templates, configuration normale de l'accueil
+                    addField('accueil.heroTitle', 'Titre principal'); 
+                    addField('accueil.heroSubtitle', 'Sous-titre', 'textarea'); 
+                    addField('accueil.heroImage', 'Image de fond (URL)');
+                    addField('accueil.ctaText', 'Texte du bouton'); 
+                    addField('accueil.ctaLink', 'Lien du bouton');
+                    addDivider();
+                    addSubheading('Statistiques');
+                    websiteData.accueil.stats.forEach((_, i) => {
+                        addField(`accueil.stats.${i}.number`, `Chiffre ${i + 1}`);
+                        addField(`accueil.stats.${i}.label`, `Label ${i + 1}`);
+                    });
+                }
                 break;
             case 'services':
                 addField('services.pageTitle', 'Titre de la page');
@@ -579,6 +746,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if(navLinks.length > 0) {
                  showPage(navLinks[0].dataset.page);
             }
+            const forms = document.querySelectorAll('form[action*="formsubmit.co"]');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.textContent = 'Envoi en cours...';
+                        submitBtn.disabled = true;
+                    }
+                });
+            });
         });
     <\/script>
 </body></html>`;
@@ -595,12 +772,56 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.importFileInput.addEventListener('change', importJson);
     
     DOM.requestFeatureBtn.addEventListener('click', () => {
-        DOM.jsonConfigInput.value = JSON.stringify(websiteData, null, 2);
         DOM.modal.classList.add('visible');
     });
     DOM.modalCloseBtn.addEventListener('click', () => DOM.modal.classList.remove('visible'));
     DOM.modal.addEventListener('click', (e) => { if (e.target === DOM.modal) DOM.modal.classList.remove('visible'); });
     
+    DOM.featureRequestForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nom = document.getElementById('featureName').value;
+        const details = document.getElementById('featureDetails').value;
+        
+        const formData = {
+            nom: nom,
+            details: details,
+            configuration: JSON.stringify(websiteData),
+            timestamp: new Date().toISOString()
+        };
+        
+        // Envoyer directement par email
+        const form = document.createElement('form');
+        form.action = 'https://formsubmit.co/school.dlecointre@gmail.com';
+        form.method = 'POST';
+        form.style.display = 'none';
+        
+        const inputs = [
+            { name: '_subject', value: `Nouvelle demande: ${nom}` },
+            { name: '_captcha', value: 'false' },
+            { name: '_next', value: 'data:text/html,<h2>Votre demande a été envoyée avec succès!</h2><p>Nous vous répondrons rapidement.</p>' },
+            { name: 'nom_demande', value: nom },
+            { name: 'details', value: details },
+            { name: 'configuration', value: JSON.stringify(websiteData, null, 2) },
+            { name: 'timestamp', value: formData.timestamp }
+        ];
+        
+        inputs.forEach(({ name, value }) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+        
+        DOM.modal.classList.remove('visible');
+        document.getElementById('featureName').value = '';
+        document.getElementById('featureDetails').value = '';
+    });
+    
+    updateTabsForTemplate(websiteData.general.templateId);
     applyTheme();
     switchTab(currentCustomizerPage);
     renderPreview(currentPreviewPage);
