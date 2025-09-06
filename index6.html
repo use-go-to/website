@@ -801,7 +801,10 @@ document.addEventListener('DOMContentLoaded', () => {
             { name: '_next', value: 'data:text/html,<h2>Votre demande a été envoyée avec succès!</h2><p>Nous vous répondrons rapidement.</p>' },
             { name: 'nom_demande', value: nom },
             { name: 'details', value: details },
-            { name: 'configuration', value: JSON.stringify(websiteData, null, 2) },
+            { name: 'site_title', value: websiteData.general.siteTitle },
+            { name: 'template', value: websiteData.general.templateId },
+            { name: 'email_client', value: websiteData.general.email },
+            { name: 'phone_client', value: websiteData.general.phone },
             { name: 'timestamp', value: formData.timestamp }
         ];
         
