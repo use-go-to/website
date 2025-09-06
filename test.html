@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problème de réception d'emails FormSubmit</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #f94144;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .problem-section {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .solution-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .solution-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .solution-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .solution-card h3 .number {
+            background: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .code {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .email-check {
+            background: #e6f7ff;
+            border-left: 4px solid var(--success);
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .test-form {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        button:hover {
+            background: var(--secondary);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--dark);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .solution-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Problème de réception d'emails FormSubmit</h1>
+            <p class="subtitle">Solutions aux problèmes courants de configuration</p>
+        </header>
+        
+        <div class="content">
+            <div class="problem-section">
+                <h2>Vous ne recevez pas les emails de FormSubmit?</h2>
+                <p>Plusieurs raisons peuvent expliquer pourquoi vous ne recevez pas les emails de confirmation ou les soumissions de formulaire.</p>
+            </div>
+            
+            <h2>Solutions possibles :</h2>
+            
+            <div class="solution-grid">
+                <div class="solution-card">
+                    <h3><span class="number">1</span> Vérifiez les spams</h3>
+                    <p>Les emails de FormSubmit peuvent parfois être classés comme spam. Vérifiez votre dossier de courriers indésirables.</p>
+                </div>
+                
+                <div class="solution-card">
+                    <h3><span class="number">2</span> Configuration DNS</h3>
+                    <p>Ajoutez un enregistrement TXT à votre domaine pour vérifier la propriété et améliorer la délivrabilité.</p>
+                    <div class="code">v=formsubmit-prove-ownership xxxxxxxx</div>
+                </div>
+                
+                <div class="solution-card">
+                    <h3><span class="number">3</span> Email de secours</h3>
+                    <p>Ajoutez un email de secours dans les paramètres de FormSubmit au cas où l'email principal ne fonctionnerait pas.</p>
+                </div>
+            </div>
+            
+            <div class="email-check">
+                <h3>Vérification de votre configuration actuelle</h3>
+                <p>Votre formulaire est configuré avec l'action :</p>
+                <div class="code">action="https://formsubmit.co/school.dlecointre@gmail.com"</div>
+                <p>Cette configuration semble correcte. Le problème pourrait venir des serveurs de FormSubmit ou de votre fournisseur email.</p>
+            </div>
+            
+            <h2>Testez votre configuration</h2>
+            <p>Vous pouvez essayer d'envoyer un message test avec le formulaire ci-dessous :</p>
+            
+            <div class="test-form">
+                <form action="https://formsubmit.co/school.dlecointre@gmail.com" method="POST">
+                    <input type="hidden" name="_subject" value="Test de configuration FormSubmit">
+                    <input type="hidden" name="_template" value="table">
+                    
+                    <div class="form-group">
+                        <label for="name">Votre nom</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message test</label>
+                        <textarea id="message" name="message" rows="4" required>Ceci est un test de configuration FormSubmit</textarea>
+                    </div>
+                    
+                    <input type="hidden" name="_captcha" value="false">
+                    
+                    <button type="submit">Envoyer un test</button>
+                </form>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                <h3>Solutions alternatives</h3>
+                <p>Si FormSubmit continue de poser problème, vous pouvez envisager ces alternatives :</p>
+                <ul style="margin: 15px 0 15px 30px;">
+                    <li>Utiliser un service similaire comme <a href="https://getform.io">GetForm</a> ou <a href="https://formspree.io">Formspree</a></li>
+                    <li>Configurer un script PHP personnalisé pour traiter les formulaires</li>
+                    <li>Utiliser un service de backend comme Firebase ou AWS Lambda</li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 - Guide de dépannage FormSubmit</p>
+        </footer>
+    </div>
+</body>
+</html>
