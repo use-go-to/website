@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Créateur de Site PRO</title>
+<title>Créateur de Site PRO v3</title>
 <style id="main-styles">
     :root {
-        --color-accent: #007bff; --color-heading: #212529; --color-text: #343a40; --color-bg: #ffffff; --color-surface: #f8f9fa;
+        --color-accent: #007bff; --color-heading: #212529; --color-hero-title: #ffffff; --color-hero-subtitle: #2c3e50; --color-text: #343a40; --color-bg: #ffffff; --color-surface: #f8f9fa;
         --border-color: #dee2e6; --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         --shadow-sm: 0 2px 10px rgba(0,0,0,0.07); --shadow-md: 0 5px 20px rgba(0,0,0,0.1);
     }
@@ -16,9 +16,14 @@
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: var(--font-main); background-color: #eef1f3; color: #333; line-height: 1.6; }
-    .container { display: flex; height: 100vh; }
-    .customizer { width: 420px; background: #fff; padding: 25px; box-shadow: var(--shadow-md); overflow-y: auto; display: flex; flex-direction: column; z-index: 10; }
-    .customizer h2 { margin-bottom: 20px; border-bottom: 2px solid var(--color-accent); padding-bottom: 10px; color: #2c3e50; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+    .container { display: flex; height: 100vh; position: relative; }
+    .customizer { width: 420px; background: #fff; padding: 25px; box-shadow: var(--shadow-md); overflow-y: auto; display: flex; flex-direction: column; z-index: 10; transition: width 0.3s, margin-left 0.3s; resize: horizontal; min-width: 300px; max-width: 600px; }
+    .customizer.collapsed { width: 0; margin-left: -420px; padding: 0; }
+    .toggle-btn { position: fixed; top: 20px; left: 420px; z-index: 1001; background: var(--color-accent); color: white; border: none; width: 40px; height: 40px; border-radius: 0 8px 8px 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: left 0.3s; box-shadow: 2px 2px 10px rgba(0,0,0,0.2); }
+    .toggle-btn.collapsed { left: 0; border-radius: 0 8px 8px 0; }
+    .resize-handle { position: absolute; top: 0; right: 0; width: 5px; height: 100%; background: var(--color-accent); cursor: ew-resize; opacity: 0; transition: opacity 0.2s; }
+    .customizer:hover .resize-handle { opacity: 0.5; }
+    .customizer h2 { margin-bottom: 20px; border-bottom: 2px solid var(--color-accent); padding-bottom: 10px; color: black; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
     .form-group { margin-bottom: 18px; }
     .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #34495e; font-size: 0.9rem; }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: inherit; transition: border-color 0.3s; background: #fdfdfd; font-size: 1rem; }
@@ -27,88 +32,208 @@
     .form-group.color-input { display: flex; align-items: center; justify-content: space-between; }
     .form-group.color-input input[type="color"] { width: 50px; height: 35px; padding: 2px; border: none; background: none; cursor: pointer; }
     .form-group.color-input .color-value { font-family: monospace; background: #f1f1f1; padding: 5px 8px; border-radius: 4px; }
-    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 20px; }
-    .tabs button { padding: 12px 5px; cursor: pointer; background: #f9f9f9; border: 1px solid #ddd; font-weight: 600; transition: all 0.3s; border-radius: 5px; font-size:0.9rem; }
+    .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .checkbox-group input[type="checkbox"] { width: auto; margin: 0; }
+    .checkbox-group label { margin: 0; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 20px; }
+    .tabs button { padding: 12px 5px; cursor: pointer; background: #f9f9f9; border: 1px solid #ddd; font-weight: 600; transition: all 0.3s; border-radius: 5px; font-size:0.9rem; flex-grow: 1; }
     .tabs button.active { background: var(--color-accent); color: white; border-color: var(--color-accent); }
-    .preview { flex: 1; padding: 20px; background-color: #dce3e9; display: flex; justify-content: center; align-items: center; }
+    .preview { flex: 1; padding: 20px; background-color: #dce3e9; display: flex; justify-content: center; align-items: center; transition: padding 0.3s; }
+    .customizer.collapsed + .preview { padding: 20px; }
+    .preview-container { transition: opacity 0.4s ease-in-out; }
     .preview-frame { width: 100%; height: 100%; display: flex; flex-direction: column; }
     .preview-container { width: 100%; flex: 1; border: 8px solid #333; border-radius: 10px; background: var(--color-bg); color: var(--color-text); box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; }
     .btn { display: inline-block; padding: 12px 25px; background: var(--color-accent); color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; text-align: center; text-decoration: none; transition: all 0.3s; font-size: 1rem; }
     .btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-    .btn-group { margin-top: auto; padding-top: 20px; border-top: 1px solid #eee; }
+    .btn.btn-secondary { background-color: #6c757d; }
+    .btn-group { margin-top: auto; padding-top: 20px; border-top: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn-group .btn { flex-grow: 1; font-size: 0.9rem; }
     hr.form-divider { border: none; border-top: 1px solid #eee; margin: 25px 0; }
 
-    /* --- Styles pour la prévisualisation --- */
+    /* --- Styles communs pour la prévisualisation --- */
     #websitePreview { height: 100%; overflow-y: auto; font-family: var(--font-main); background: var(--color-bg); color: var(--color-text); scroll-behavior: smooth; }
-    #websitePreview header { position: sticky; top: 0; z-index: 1000; background: var(--color-surface); box-shadow: var(--shadow-sm); }
-    #websitePreview nav { display:flex; justify-content:space-between; align-items:center; padding: 15px 5%; }
-    #websitePreview .logo-container .logo { font-size:1.6rem; font-weight:700; color: var(--color-accent); }
-    #websitePreview .logo-container .subtext { font-size: 0.9rem; color: var(--color-text); opacity: 0.8; }
-    #websitePreview nav ul { list-style:none; display:flex; gap:30px; }
-    #websitePreview nav a { color: var(--color-text); text-decoration:none; font-weight:600; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: all 0.3s; }
-    #websitePreview nav a.active, #websitePreview nav a:hover { color: var(--color-accent); border-bottom-color: var(--color-accent); }
     #websitePreview .page-content { display: none; }
     #websitePreview .page-content.active { display: block; animation: fadeIn 0.5s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    #websitePreview .hero { display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-height: 60vh; color: #fff; background-size: cover; background-position: center; padding: 20px; position: relative; }
-    #websitePreview .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 0; }
-    #websitePreview .hero-content { position: relative; z-index: 1; }
-    #websitePreview h1 { font-size: clamp(2rem, 5vw, 3rem); color: #fff; } #websitePreview h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 40px; text-align: center; color: var(--color-heading); } #websitePreview h3 { font-size: 1.5rem; color: var(--color-heading); }
+    #websitePreview h2 { color: var(--color-heading); } #websitePreview h3 { color: var(--color-heading); }
+    #websitePreview .btn { background: var(--color-accent); color: #fff; text-decoration: none; }
     #websitePreview .section { padding: 60px 5%; }
     #websitePreview .section-alt { background-color: var(--color-surface); }
-    #websitePreview .about p { max-width: 800px; margin: 20px auto 0; text-align: center; font-size: 1.1rem; }
     #websitePreview .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
     #websitePreview .card { background: var(--color-bg); padding: 25px; border-radius: 8px; box-shadow: var(--shadow-sm); }
-    #websitePreview .testimonial-card p { font-style: italic; }
-    #websitePreview .testimonial-card .author { font-weight: bold; margin-top: 15px; color: var(--color-accent); }
-    #websitePreview .catalog-item { padding: 0; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; }
-    #websitePreview .catalog-item:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-    #websitePreview .catalog-item img { width: 100%; height: 200px; object-fit: cover; border-top-left-radius: 8px; border-top-right-radius: 8px; }
-    #websitePreview .catalog-item .item-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-    #websitePreview .catalog-item h3 { margin-top: 0; margin-bottom: 10px; } #websitePreview .catalog-item p { flex-grow: 1; margin-bottom: 15px; } #websitePreview .catalog-item .price { font-weight: bold; color: var(--color-accent); text-align: right; }
-    #websitePreview .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-    #websitePreview .gallery-item img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; transition: transform 0.3s; }
-    #websitePreview .gallery-item img:hover { transform: scale(1.05); }
-    #websitePreview .gallery-item figcaption { text-align: center; margin-top: 10px; font-style: italic; opacity: 0.8; }
-    #websitePreview .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-    #websitePreview .contact-info p { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; } #websitePreview .contact-info p i { color: var(--color-accent); font-size: 1.2rem; width: 20px; text-align: center; }
-    #websitePreview .map-container iframe { width: 100%; height: 100%; min-height: 250px; border: 0; border-radius: 8px; }
-    #websitePreview footer { background: #212529; color: #fff; padding:40px 20px; text-align:center; }
-    #websitePreview .social-links a { color: #fff; font-size: 1.5rem; margin: 0 10px; transition: color 0.3s; }
-    #websitePreview .social-links a:hover { color: var(--color-accent); }
+    #websitePreview a { color: var(--color-accent); }
+    #websitePreview footer { text-align:center; padding: 40px 20px; }
+    #websitePreview .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; text-align: center; }
+    #websitePreview .stat-item { padding: 20px; }
+    #websitePreview .stat-number { font-size: 2.5rem; font-weight: bold; color: var(--color-accent); }
+    #websitePreview .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+    #websitePreview .feature-item { text-align: center; padding: 30px 20px; }
+    #websitePreview .feature-icon { font-size: 3rem; color: var(--color-accent); margin-bottom: 20px; }
 
-    /* --- Responsive Design --- */
-    @media (max-width: 900px) {
-        .container { flex-direction: column; height: auto; }
-        .customizer { width: 100%; height: auto; max-height: 50vh; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .preview { padding: 10px; height: 100vh; }
-        .preview-container { border-width: 4px; }
-        #websitePreview nav { flex-direction: column; gap: 15px; }
+    /* === STYLES TEMPLATE: ARTISAN (Défaut) === */
+    .template-artisan header { position: sticky; top: 0; z-index: 1000; background: var(--color-surface); box-shadow: var(--shadow-sm); }
+    .template-artisan nav { display:flex; justify-content:space-between; align-items:center; padding: 15px 5%; flex-wrap: wrap; gap: 15px; }
+    @media (max-width: 768px) {
+        .template-artisan nav { flex-direction: column; text-align: center; }
+        .template-artisan nav ul { flex-wrap: wrap; justify-content: center; }
+        .template-artisan .contact-info { justify-content: center; }
+    }
+    .template-artisan .logo-container .logo { font-size:1.6rem; font-weight:700; color: var(--color-accent); }
+    .template-artisan .logo-container .subtext { font-size: 0.9rem; color: var(--color-text); opacity: 0.8; }
+    .template-artisan nav ul { list-style:none; display:flex; gap:30px; }
+    .template-artisan nav a { color: var(--color-text); text-decoration:none; font-weight:600; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: all 0.3s; }
+    .template-artisan nav a.active, .template-artisan nav a:hover { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+    .template-artisan .hero { display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-height: 60vh; color: #fff; background-size: cover; background-position: center; padding: 20px; position: relative; }
+    .template-artisan .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 0; }
+    .template-artisan .hero-content { position: relative; z-index: 1; }
+    .template-artisan .hero h1 { font-size: clamp(2rem, 5vw, 3rem); color: var(--color-hero-title) !important; }
+    .template-artisan .hero p { color: var(--color-hero-subtitle); }
+    .template-artisan h2 { text-align: center; margin-bottom: 40px; color: var(--color-heading); }
+    .template-artisan h1 { color: var(--color-heading); }
+    .template-artisan .about p { max-width: 800px; margin: 20px auto 0; text-align: center; font-size: 1.1rem; }
+    .template-artisan .catalog-item { padding: 0; transition: transform 0.3s, box-shadow 0.3s; }
+    .template-artisan .catalog-item:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+    .template-artisan .catalog-item img { width: 100%; height: 200px; object-fit: cover; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+    .template-artisan .catalog-item .item-content { padding: 20px; }
+    .template-artisan footer { background: #212529; color: #fff; }
+    .template-artisan .social-links a { color: #fff; font-size: 1.5rem; margin: 0 10px; transition: color 0.3s; }
+    .template-artisan .social-links a:hover { color: var(--color-accent); }
+
+    /* === STYLES TEMPLATE: CORPORATE MODERNE === */
+    .template-corporate { font-family: 'Poppins', var(--font-main); }
+    .template-corporate header { background: var(--color-bg); border-bottom: 1px solid var(--border-color); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 15px; }
+    @media (max-width: 768px) {
+        .template-corporate header { flex-direction: column; text-align: center; }
+        .template-corporate nav ul { flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .template-corporate .hero { grid-template-columns: 1fr; text-align: center; }
+        .template-corporate .hero-image { order: -1; max-width: 400px; margin: 0 auto; }
+    }
+    .template-corporate .logo { font-size: 1.8rem; font-weight: 600; color: var(--color-heading); }
+    .template-corporate nav ul { list-style: none; display: flex; gap: 25px; }
+    .template-corporate nav a { text-decoration: none; color: var(--color-text); font-weight: 500; position: relative; padding: 5px 0; }
+    .template-corporate nav a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--color-accent); transition: width 0.3s; }
+    .template-corporate nav a:hover::after, .template-corporate nav a.active::after { width: 100%; }
+    .template-corporate .hero { background-color: var(--color-surface); display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; min-height: 80vh; padding: 60px 5%;}
+    .template-corporate .hero-text h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); line-height: 1.2; }
+    .template-corporate .hero-text p { font-size: 1.2rem; margin: 20px 0 30px; }
+    .template-corporate .hero-image { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: var(--shadow-md); }
+    .template-corporate h2 { text-align: center; font-size: 2.2rem; margin-bottom: 40px; }
+    .template-corporate footer { background-color: var(--color-surface); color: var(--color-text); border-top: 1px solid var(--border-color); }
+    .template-corporate .social-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; }
+    .template-corporate .social-links a { color: var(--color-text); font-size: 1.5rem; transition: color 0.3s; }
+    .template-corporate .social-links a:hover { color: var(--color-accent); }
+
+    /* === STYLES TEMPLATE: PORTFOLIO CRÉATIF === */
+    .template-portfolio { background-color: var(--color-bg); }
+    .template-portfolio header { padding: 40px; text-align: center; }
+    .template-portfolio .logo { font-size: 2.5rem; font-weight: 300; letter-spacing: 2px; color: var(--color-heading); }
+    .template-portfolio .subtext { font-size: 1rem; color: var(--color-text); margin-top: 5px; }
+    .template-portfolio nav { text-align: center; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 15px 0; margin-bottom: 40px; }
+    .template-portfolio nav ul { list-style: none; display: inline-flex; gap: 40px; }
+    .template-portfolio nav a { text-decoration: none; color: var(--color-text); font-weight: 500; }
+    .template-portfolio nav a.active { color: var(--color-accent); font-weight: 700; }
+    .template-portfolio h1, .template-portfolio h2 { text-align: center; font-weight: 400; }
+    .template-portfolio .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 0 10px; }
+    .template-portfolio .gallery-item { position: relative; overflow: hidden; height: 250px; border-radius: 8px; }
+    .template-portfolio .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+    #websitePreview .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    #websitePreview .gallery-item { height: 250px; overflow: hidden; border-radius: 8px; position: relative; }
+    #websitePreview .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+    .template-portfolio .gallery-item:hover img { transform: scale(1.1); }
+    .template-portfolio .gallery-item figcaption { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.7); color: white; text-align: center; padding: 10px; transform: translateY(100%); transition: transform 0.4s ease; }
+    .template-portfolio .gallery-item:hover figcaption { transform: translateY(0); }
+    .template-portfolio .section { max-width: 900px; margin: 0 auto; }
+    .template-portfolio footer { background: var(--color-bg); color: var(--color-text); font-size: 0.9rem; }
+
+    /* === STYLES TEMPLATE: MÉDICAL === */
+    .template-medical { background: var(--color-bg); min-height: 100vh; }
+    .template-medical header { background: var(--color-surface); backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); padding: 25px 5%; position: sticky; top: 0; z-index: 1000; }
+    .template-medical .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .template-medical .logo { font-size: 2.2rem; font-weight: 300; color: var(--color-accent); display: flex; align-items: center; gap: 15px; }
+    .template-medical .logo::before { content: '⚕️'; font-size: 2rem; }
+    .template-medical .contact-info { display: flex; gap: 40px; }
+    .template-medical .contact-item { display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: rgba(46,204,113,0.1); border-radius: 25px; color: var(--color-accent); font-weight: 500; }
+    .template-medical nav ul { list-style: none; display: flex; justify-content: center; gap: 50px; }
+    .template-medical nav a { color: var(--color-text); text-decoration: none; font-weight: 500; position: relative; padding: 5px 0; }
+    .template-medical nav a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--color-accent); transition: width 0.3s; }
+    .template-medical nav a:hover::after, .template-medical nav a.active::after { width: 100%; }
+    .template-medical nav a:hover, .template-medical nav a.active { color: var(--color-accent); }
+    .template-medical .hero { padding: 120px 5%; text-align: center; color: var(--color-hero-title); }
+    .template-medical .hero-content { max-width: 700px; margin: 0 auto; }
+    .template-medical .hero h1 { font-size: 3.5rem; font-weight: 300; margin-bottom: 25px; }
+    .template-medical .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; padding: 100px 5%; }
+    .template-medical .service-card { background: var(--color-surface); padding: 50px 30px; border-radius: 25px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); transition: all 0.4s; position: relative; overflow: hidden; }
+    .template-medical .service-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--color-accent), #27ae60); }
+    .template-medical .service-card:hover { transform: translateY(-15px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+    .template-medical .service-icon { font-size: 4rem; color: var(--color-accent); margin-bottom: 25px; }
+    @media (max-width: 768px) {
+        .template-medical .header-top { flex-direction: column; gap: 20px; }
+        .template-medical .contact-info { flex-direction: column; gap: 15px; }
+        .template-medical nav ul { flex-direction: column; gap: 15px; }
+        .template-medical .hero h1 { font-size: 2.5rem; }
+    }
+
+    /* === STYLES TEMPLATE: E-COMMERCE === */
+    .template-ecommerce { background: var(--color-bg); color: var(--color-text); min-height: 100vh; }
+    .template-ecommerce header { background: var(--color-surface); backdrop-filter: blur(20px); padding: 20px 5%; position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color); }
+    .template-ecommerce .header-content { display: flex; justify-content: space-between; align-items: center; }
+    .template-ecommerce .logo { font-size: 2rem; font-weight: 700; background: linear-gradient(45deg, var(--color-accent), #ff6b6b); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .template-ecommerce .header-actions { display: flex; gap: 25px; align-items: center; }
+    .template-ecommerce .header-icons { display: flex; gap: 20px; }
+    .template-ecommerce .header-icon { width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
+    .template-ecommerce .header-icon:hover { background: var(--color-accent); transform: scale(1.1); }
+    .template-ecommerce nav { background: var(--color-surface); padding: 15px 5%; margin-top: 80px; }
+    .template-ecommerce nav ul { list-style: none; display: flex; justify-content: center; gap: 40px; }
+    .template-ecommerce nav a { color: var(--color-text); text-decoration: none; font-weight: 500; position: relative; padding: 5px 0; }
+    .template-ecommerce nav a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--color-accent); transition: width 0.3s; }
+    .template-ecommerce nav a:hover::after, .template-ecommerce nav a.active::after { width: 100%; }
+    .template-ecommerce nav a:hover, .template-ecommerce nav a.active { color: var(--color-accent); }
+    .template-ecommerce .hero { padding: 150px 5% 100px; text-align: center; }
+    .template-ecommerce .hero h1 { font-size: 4rem; font-weight: 300; margin-bottom: 25px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); color: var(--color-hero-title); }
+    .template-ecommerce .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; padding: 100px 5%; background: var(--color-bg); }
+    .template-ecommerce .product-card { background: var(--color-surface); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--border-color); transition: all 0.4s; }
+    .template-ecommerce .product-card:hover { transform: translateY(-15px) scale(1.02); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+    .template-ecommerce .product-image { width: 100%; height: 250px; object-fit: cover; }
+    .template-ecommerce .product-info { padding: 30px; }
+    .template-ecommerce .product-price { font-size: 1.5rem; font-weight: 700; background: linear-gradient(45deg, var(--color-accent), #ff6b6b); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0; }
+    .template-ecommerce .btn-cart { background: linear-gradient(45deg, var(--color-accent), #ff6b6b); color: white; border: none; padding: 15px 30px; border-radius: 30px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: 600; transition: all 0.3s; }
+    .template-ecommerce .btn-cart:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(231,76,60,0.3); }
+    @media (max-width: 768px) {
+        .template-ecommerce .header-content { flex-direction: column; gap: 20px; }
+        .template-ecommerce nav ul { flex-direction: column; gap: 15px; }
+        .template-ecommerce .hero h1 { font-size: 2.5rem; }
     }
 </style>
 </head>
 <body>
 <div class="container">
-    <div class="customizer">
-        <h2><i class="fas fa-palette"></i> Panneau PRO</h2>
-        <div class="tabs">
+    <button class="toggle-btn" id="toggleBtn" title="Masquer/Afficher le dashboard">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <div class="customizer" id="customizer">
+        <div class="resize-handle" id="resizeHandle"></div>
+        <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+        
+        <div class="tabs" id="tabsContainer">
             <button class="tab-btn active" data-page="general">Général</button>
             <button class="tab-btn" data-page="accueil">Accueil</button>
-            <button class="tab-btn" data-page="catalogue">Catalogue</button>
+            <button class="tab-btn" data-page="services">Services</button>
+            <button class="tab-btn" data-page="apropos">À Propos</button>
             <button class="tab-btn" data-page="galerie">Galerie</button>
             <button class="tab-btn" data-page="temoignages">Témoignages</button>
             <button class="tab-btn" data-page="contact">Contact</button>
+            <button class="tab-btn" data-page="ameliorations">Améliorations</button>
         </div>
         <div id="tabContent"></div>
         <div class="btn-group">
-            <button class="btn" id="exportJsonBtn"><i class="fas fa-file-code"></i> Exporter la Configuration</button>
+            <button class="btn btn-secondary" id="exportJsonBtn" title="Exporter la configuration en JSON"><i class="fas fa-file-code"></i> Exporter</button>
         </div>
     </div>
     <div class="preview">
         <div class="preview-frame">
-             <div class="preview-container">
-                  <div id="websitePreview"></div>
-             </div>
+              <div class="preview-container">
+                    <div id="websitePreview"></div>
+              </div>
         </div>
     </div>
 </div>
@@ -116,64 +241,499 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. STATE (Toutes les données du site) ---
+    
     let websiteData = {
         general: {
-            siteTitle: "Artisan Créateur", headerSubtext: "L'excellence, sur mesure.", theme: "light",
-            colorAccent: '#c0392b', colorHeading: '#2c3e50', colorText: '#34495e', colorBg: '#ffffff', colorSurface: '#ecf0f1',
+            siteTitle: "Entreprise Pro", headerSubtext: "Excellence & Innovation", theme: "light", templateId: 'artisan',
+            colorAccent: '#c0392b', colorHeading: '#2c3e50', colorHeroTitle: '#ffffff', colorHeroSubtitle: '#ffffff', colorText: '#34495e', colorBg: '#ffffff', colorSurface: '#ecf0f1',
+            phone: '01 23 45 67 89', email: 'contact@entreprise.fr', address: '123 Rue de la Réussite, 75001 Paris',
+            fontFamily: 'system'
         },
         accueil: {
-            heroTitle: 'L\'Art de la Création', heroSubtitle: 'Donnez vie à vos projets avec un savoir-faire unique.', heroImage: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=2070&auto=format&fit=crop',
-            ctaText: 'Découvrir nos services', ctaLink: '#catalogue',
-            aboutTitle: 'Notre Histoire', aboutText: 'Passionnés par notre métier, nous combinons techniques traditionnelles et innovations pour des résultats qui dépassent vos attentes. Chaque projet est une nouvelle aventure.',
+            heroTitle: 'Votre Partenaire de Confiance', heroSubtitle: 'Nous transformons vos idées en succès avec notre expertise et notre engagement.', 
+            heroImage: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?q=80&w=2126&auto=format&fit=crop',
+            ctaText: 'Découvrir nos services', ctaLink: '#services',
+            stats: [
+                { number: '500+', label: 'Clients satisfaits' },
+                { number: '15', label: 'Années d\'expérience' },
+                { number: '98%', label: 'Taux de satisfaction' }
+            ]
         },
-        catalogue: {
+        apropos: {
+            title: 'À Propos de Nous', 
+            text: 'Fondée en 2008, notre entreprise s\'est imposée comme un leader dans son domaine grâce à notre approche innovante et notre engagement envers l\'excellence. Notre équipe de professionnels expérimentés met tout en œuvre pour dépasser vos attentes.',
+            mission: 'Offrir des solutions de qualité supérieure qui créent de la valeur pour nos clients.',
+            vision: 'Être reconnu comme le partenaire de référence dans notre secteur.',
+            values: ['Excellence', 'Innovation', 'Intégrité', 'Collaboration'],
+            teamImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop',
+            foundedYear: '2008',
+            employeeCount: '50+',
+            projectsCompleted: '1000+'
+        },
+        services: {
             pageTitle: 'Nos Services',
-            items: [{ name: 'Conception sur Mesure', desc: 'Analyse de vos besoins et création d\'un plan détaillé.', price: 'Sur devis', image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070&auto=format&fit=crop' }, { name: 'Fabrication Artisanale', desc: 'Réalisation dans notre atelier avec des matériaux de première qualité.', price: 'À partir de 450€', image: 'https://plus.unsplash.com/premium_photo-1672287578699-618ea6dbcc9e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }],
+            intro: 'Découvrez notre gamme complète de services conçus pour répondre à tous vos besoins.',
+            items: [
+                { name: 'Conseil Stratégique', desc: 'Analyse approfondie et recommandations personnalisées pour optimiser votre activité.', price: 'À partir de 150€/h', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2070&auto=format&fit=crop', features: ['Audit complet', 'Plan d\'action', 'Suivi personnalisé'] },
+                { name: 'Solutions Techniques', desc: 'Mise en œuvre de solutions innovantes adaptées à vos défis spécifiques.', price: 'Sur devis', image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop', features: ['Technologies avancées', 'Support 24/7', 'Formation incluse'] },
+                { name: 'Accompagnement', desc: 'Support continu pour garantir le succès de vos projets sur le long terme.', price: 'À partir de 800€/mois', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop', features: ['Suivi régulier', 'Rapports détaillés', 'Optimisation continue'] }
+            ],
+            heroImage: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop',
+            testimonialText: 'Un service exceptionnel qui a transformé notre entreprise. Résultats au-delà de nos attentes !',
+            testimonialAuthor: 'Sophie Martin, CEO TechCorp'
         },
         galerie: {
-            pageTitle: 'Nos Réalisations en Images',
+            pageTitle: 'Nos Réalisations',
+            intro: 'Découvrez quelques-unes de nos réalisations qui témoignent de notre savoir-faire.',
             images: [
-                { url: 'https://images.unsplash.com/photo-1638718260002-18bdc8082608?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', caption: 'Projet résidentiel A' },
-                { url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', caption: 'Détail de fabrication' },
-                { url: 'https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', caption: 'Projet commercial B' },
+                { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop', caption: 'Projet Corporate A - Transformation digitale' },
+                { url: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=2069&auto=format&fit=crop', caption: 'Innovation B - Solution sur mesure' },
+                { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop', caption: 'Accompagnement C - Croissance durable' }
             ]
         },
         temoignages: {
-            title: 'Ce que disent nos clients',
+            title: 'Témoignages Clients',
+            intro: 'Découvrez ce que nos clients pensent de nos services.',
             items: [
-                { text: 'Un professionnalisme et une écoute rares. Le résultat est au-delà de mes espérances. Je recommande les yeux fermés !', author: 'Julien M.' },
-                { text: 'Équipe très réactive et travail d\'une qualité irréprochable. Les délais ont été respectés. Parfait.', author: 'Sophie L.' },
+                { text: 'Une équipe exceptionnelle qui a transformé notre approche business. Résultats au-delà de nos espérances !', author: 'Marie Dubois', company: 'CEO, TechStart' },
+                { text: 'Professionnalisme, réactivité et expertise. Je recommande vivement leurs services.', author: 'Pierre Martin', company: 'Directeur, InnovCorp' }
             ]
         },
         contact: {
-            pageTitle: 'Nous Contacter', introText: 'Un projet en tête ? Parlons-en !', address: '5 Avenue de l\'Artisanat, 75012 Paris', phone: '01 23 45 67 89', email: 'contact@artisan.fr',
-            mapUrl: 'http://googleusercontent.com/maps.google.com/6',
-            footerText: `© ${new Date().getFullYear()} Artisan Créateur. Tous droits réservés. Site Web réalisé par Lecointre David`,
-            social: { facebook: 'https://facebook.com', instagram: 'https://instagram.com', linkedin: 'https://linkedin.com' }
+            pageTitle: 'Contactez-nous', 
+            introText: 'Prêt à démarrer votre projet ? Contactez-nous dès aujourd\'hui pour une consultation gratuite.',
+            formTitle: 'Demande de Contact',
+            successUrl: '',
+            footerText: `© ${new Date().getFullYear()} Entreprise Pro. Tous droits réservés.`,
+            social: { facebook: 'https://facebook.com', linkedin: 'https://linkedin.com', twitter: 'https://twitter.com' },
+            horaires: 'Lun-Ven: 9h-18h | Sam: 9h-12h'
+        },
+        ameliorations: {
+            modulesAdditionnels: {
+                blog: false,
+                ecommerce: false,
+                reservation: false,
+                newsletter: false,
+                chatbot: false,
+                multilingue: false,
+                faq: false,
+                equipe: false,
+                avis: false,
+                carte: false
+            },
+            commandeSpeciale: '',
+            animations: {
+                parallax: false,
+                fadeIn: false,
+                slideIn: false
+            }
         }
     };
+    
+    const templates = {
+        'artisan': {
+            name: 'Artisan Pro',
+            defaults: { colorAccent: '#c0392b', colorHeading: '#2c3e50', colorHeroTitle: '#ffffff', colorHeroSubtitle: '#ffffff', colorText: '#34495e', colorBg: '#ffffff', colorSurface: '#ecf0f1', fontFamily: 'system' },
+            render: (data, activePage) => `
+                <div class="template-artisan">
+                    <header><nav>
+                        <div class="logo-container">
+                            <div class="logo">${data.general.siteTitle}</div>
+                            <div class="subtext">${data.general.headerSubtext}</div>
+                        </div>
+                        <ul>
+                            <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Accueil</a></li>
+                            <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Services</a></li>
+                            <li><a href="#apropos" data-page="apropos" class="${activePage === 'apropos' ? 'active' : ''}">À Propos</a></li>
+                            <li><a href="#galerie" data-page="galerie" class="${activePage === 'galerie' ? 'active' : ''}">Galerie</a></li>
+                            <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Contact</a></li>
+                        </ul>
+                        <div class="contact-info" style="display:flex; gap:15px; font-size:0.9rem; color:var(--color-text);">
+                            <span><i class="fas fa-phone" style="margin-right:5px;"></i>${data.general.phone}</span>
+                            <span><i class="fas fa-envelope" style="margin-right:5px;"></i>${data.general.email}</span>
+                        </div>
+                    </nav></header>
+                    <main>
+                        <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
+                            <section class="hero" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${data.accueil.heroImage}');"><div class="hero-content"><h1>${data.accueil.heroTitle}</h1><p style="font-size:1.2rem; margin:20px 0 30px;">${data.accueil.heroSubtitle}</p><div style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;"><a href="${data.accueil.ctaLink}" class="btn cta-btn">${data.accueil.ctaText}</a><a href="#contact" class="btn" style="background:transparent; border:2px solid white;">Nous contacter</a></div></div></section>
+                            <section class="section"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
+                            <section class="section section-alt"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto; font-size:1.1rem;">${data.apropos.text}</p></section>
+                            <section class="section testimonials"><h2>${data.temoignages.title}</h2><div class="card-grid">${data.temoignages.items.map(t => `<div class="card testimonial-card"><p>"${t.text}"</p><div class="author">- ${t.author}<br><small>${t.company}</small></div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'services' ? 'active' : ''}" id="page-services">
+                             <section class="section"><h2>${data.services.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.services.intro}</p><div class="card-grid">${data.services.items.map(i => `<div class="card catalog-item"><img src="${i.image}" alt="${i.name}"><div class="item-content"><h3>${i.name}</h3><p>${i.desc}</p><ul style="margin:15px 0;">${i.features.map(f => `<li>${f}</li>`).join('')}</ul><div class="price" style="font-weight:bold; color:var(--color-accent);">${i.price}</div></div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'apropos' ? 'active' : ''}" id="page-apropos">
+                            <section class="section"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto 40px; font-size:1.1rem;">${data.apropos.text}</p>
+                                <div class="features-grid">
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-bullseye"></i></div><h3>Notre Mission</h3><p>${data.apropos.mission}</p></div>
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-eye"></i></div><h3>Notre Vision</h3><p>${data.apropos.vision}</p></div>
+                                </div>
+                                <div style="text-align:center; margin-top:40px;"><h3>Nos Valeurs</h3><div style="display:flex; justify-content:center; gap:30px; margin-top:20px; flex-wrap:wrap;">${data.apropos.values.map(v => `<span style="background:var(--color-accent); color:white; padding:10px 20px; border-radius:25px;">${v}</span>`).join('')}</div></div>
+                            </section>
+                        </div>
+                        <div class="page-content ${activePage === 'galerie' ? 'active' : ''}" id="page-galerie">
+                            <section class="section"><h2>${data.galerie.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.galerie.intro}</p><div class="gallery-grid">${data.galerie.images.map(i => `<figure class="gallery-item"><img src="${i.url}" alt="${i.caption}"><figcaption>${i.caption}</figcaption></figure>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><p style="text-align:center; max-width:700px; margin: 0 auto 40px;">${data.contact.introText}</p>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:1000px; margin:0 auto;">
+                                    <div>
+                                        <h3>${data.contact.formTitle}</h3>
+                                        <form action="https://formsubmit.co/${data.general.email}" method="POST" style="margin-top:20px;">
+                                            <input type="hidden" name="_subject" value="Nouveau message depuis ${data.general.siteTitle}">
+                                            <input type="hidden" name="_captcha" value="false">
+                                            <input type="hidden" name="_template" value="table">
+                                            <input type="hidden" name="_autoresponse" value="Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.">
+                                            <input type="text" name="name" placeholder="Votre Nom" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="email" name="email" placeholder="Votre E-mail" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="tel" name="phone" placeholder="Votre Téléphone" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <textarea name="message" rows="5" placeholder="Votre Message" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; resize:vertical;"></textarea>
+                                            <button type="submit" class="btn">Envoyer le message</button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <h3>Nos Coordonnées</h3>
+                                        <div style="margin-top:20px;">
+                                            <p style="margin-bottom:15px;"><i class="fas fa-map-marker-alt" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.address}</p>
+                                            <p style="margin-bottom:15px;"><i class="fas fa-phone" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.phone}</p>
+                                            <p style="margin-bottom:15px;"><i class="fas fa-envelope" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.email}</p>
+                                            <p style="margin-bottom:15px;"><i class="fas fa-clock" style="color:var(--color-accent); margin-right:10px;"></i>${data.contact.horaires}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </main>
+                    <footer><div class="social-links">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" aria-label="${k}"><i class="fab fa-${k}"></i></a>`).join('')}</div><p>${data.contact.footerText}</p></footer>
+                </div>`
+        },
+        'corporate': {
+            name: 'Corporate Moderne',
+            defaults: { colorAccent: '#0052CC', colorHeading: '#172B4D', colorText: '#42526E', colorBg: '#FFFFFF', colorSurface: '#F4F5F7', fontFamily: 'roboto' },
+            render: (data, activePage) => `
+                <div class="template-corporate">
+                    <header>
+                        <div class="logo">${data.general.siteTitle}</div>
+                        <nav><ul>
+                            <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Accueil</a></li>
+                            <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Services</a></li>
+                            <li><a href="#apropos" data-page="apropos" class="${activePage === 'apropos' ? 'active' : ''}">À Propos</a></li>
+                            <li><a href="#galerie" data-page="galerie" class="${activePage === 'galerie' ? 'active' : ''}">Réalisations</a></li>
+                            <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Contact</a></li>
+                        </ul></nav>
+                    </header>
+                    <main>
+                        <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
+                            <section class="hero">
+                                <div class="hero-text">
+                                    <div style="background: var(--color-accent); color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; margin-bottom: 20px; font-size: 0.9rem; font-weight: 500;">EXCELLENCE & INNOVATION</div>
+                                    <h1>${data.accueil.heroTitle}</h1>
+                                    <p>${data.accueil.heroSubtitle}</p>
+                                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                                        <a href="${data.accueil.ctaLink}" class="btn cta-btn">${data.accueil.ctaText}</a>
+                                        <a href="#contact" class="btn" style="background: transparent; color: var(--color-accent); border: 2px solid var(--color-accent);">Demander un devis</a>
+                                    </div>
+                                </div>
+                                <img class="hero-image" src="${data.accueil.heroImage}" alt="Hero Image">
+                            </section>
+                            <section class="section"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
+                            <section class="section section-alt"><h2>${data.temoignages.title}</h2><p style="text-align:center; margin-bottom:40px;">${data.temoignages.intro}</p><div class="card-grid">${data.temoignages.items.map(t => `<div class="card"><p>"${t.text}"</p><b>- ${t.author}<br><small>${t.company}</small></b></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'services' ? 'active' : ''}" id="page-services">
+                             <section class="section"><h2>${data.services.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.services.intro}</p><div class="card-grid">${data.services.items.map(i => `<div class="card catalog-item"><h3>${i.name}</h3><p>${i.desc}</p><ul style="margin:15px 0;">${i.features.map(f => `<li>${f}</li>`).join('')}</ul><b style="color:var(--color-accent)">${i.price}</b></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'apropos' ? 'active' : ''}" id="page-apropos">
+                            <section class="section"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto 40px; font-size:1.1rem;">${data.apropos.text}</p>
+                                <div class="features-grid">
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-bullseye"></i></div><h3>Notre Mission</h3><p>${data.apropos.mission}</p></div>
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-eye"></i></div><h3>Notre Vision</h3><p>${data.apropos.vision}</p></div>
+                                </div>
+                                <div style="text-align:center; margin-top:40px;"><h3>Nos Valeurs</h3><div style="display:flex; justify-content:center; gap:30px; margin-top:20px; flex-wrap:wrap;">${data.apropos.values.map(v => `<span style="background:var(--color-accent); color:white; padding:10px 20px; border-radius:25px;">${v}</span>`).join('')}</div></div>
+                            </section>
+                        </div>
+                        <div class="page-content ${activePage === 'galerie' ? 'active' : ''}" id="page-galerie">
+                            <section class="section"><h2>${data.galerie.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.galerie.intro}</p><div class="gallery-grid">${data.galerie.images.map(i => `<figure class="gallery-item"><img src="${i.url}" alt="${i.caption}"><figcaption>${i.caption}</figcaption></figure>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><p style="text-align:center; max-width:700px; margin: 0 auto 40px;">${data.contact.introText}</p>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:1000px; margin:0 auto;">
+                                    <div>
+                                        <h3>${data.contact.formTitle}</h3>
+                                        <form action="https://formsubmit.co/${data.general.email}" method="POST" style="margin-top:20px;">
+                                            <input type="hidden" name="_subject" value="Nouveau message depuis ${data.general.siteTitle}">
+                                            <input type="hidden" name="_captcha" value="false">
+                                            <input type="hidden" name="_template" value="table">
+                                            <input type="hidden" name="_autoresponse" value="Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.">
+                                            <input type="text" name="name" placeholder="Votre Nom" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="email" name="email" placeholder="Votre E-mail" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="tel" name="phone" placeholder="Votre Téléphone" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <textarea name="message" rows="5" placeholder="Votre Message" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; resize:vertical;"></textarea>
+                                            <button type="submit" class="btn">Envoyer le message</button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <h3>Nos Coordonnées</h3>
+                                        <div style="margin-top:20px;">
+                                            <p style="margin-bottom:15px;"><i class="fas fa-map-marker-alt" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.address}</p>
+                                            <p style="margin-bottom:15px;"><i class="fas fa-phone" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.phone}</p>
+                                            <p style="margin-bottom:15px;"><i class="fas fa-envelope" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.email}</p>
+                                            <p style="margin-bottom:15px;"><i class="fas fa-clock" style="color:var(--color-accent); margin-right:10px;"></i>${data.contact.horaires}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </main>
+                    <footer><div class="social-links">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" aria-label="${k}"><i class="fab fa-${k}"></i></a>`).join('')}</div><p>${data.contact.footerText}</p></footer>
+                </div>`
+        },
+        'portfolio': {
+            name: 'Portfolio Créatif',
+            defaults: { colorAccent: '#E91E63', colorHeading: '#212121', colorText: '#616161', colorBg: '#FFFFFF', colorSurface: '#FAFAFA', fontFamily: 'playfair' },
+            render: (data, activePage) => `
+                <div class="template-portfolio">
+                     <header>
+                        <div class="logo">${data.general.siteTitle}</div>
+                        <div class="subtext">${data.general.headerSubtext}</div>
+                    </header>
+                    <nav><ul>
+                        <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Portfolio</a></li>
+                        <li><a href="#apropos" data-page="apropos" class="${activePage === 'apropos' ? 'active' : ''}">À Propos</a></li>
+                        <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Services</a></li>
+                        <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Contact</a></li>
+                    </ul></nav>
+                    <main>
+                         <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
+                            <section class="section"><h2>${data.galerie.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.galerie.intro}</p><div class="gallery-grid">${data.galerie.images.map(i => `<figure class="gallery-item"><img src="${i.url}" alt="${i.caption}"><figcaption>${i.caption}</figcaption></figure>`).join('')}</div></section>
+                            <section class="section section-alt"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'apropos' ? 'active' : ''}" id="page-apropos">
+                            <section class="section"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto 40px;">${data.apropos.text}</p>
+                                <div class="features-grid">
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-palette"></i></div><h3>Créativité</h3><p>${data.apropos.mission}</p></div>
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-lightbulb"></i></div><h3>Innovation</h3><p>${data.apropos.vision}</p></div>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="page-content ${activePage === 'services' ? 'active' : ''}" id="page-services">
+                             <section class="section"><h2>${data.services.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.services.intro}</p><div class="card-grid">${data.services.items.map(i => `<div class="card catalog-item"><h3>${i.name}</h3><p>${i.desc}</p><ul style="margin:15px 0;">${i.features.map(f => `<li>${f}</li>`).join('')}</ul><b style="color:var(--color-accent)">${i.price}</b></div>`).join('')}</div></section>
+                        </div>
+                         <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><p style="text-align:center; margin-bottom:40px;">${data.contact.introText}</p>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; max-width:1000px; margin:0 auto;">
+                                    <div>
+                                        <form action="https://formsubmit.co/${data.general.email}" method="POST">
+                                            <input type="hidden" name="_subject" value="Nouveau message depuis ${data.general.siteTitle}">
+                                            <input type="hidden" name="_captcha" value="false">
+                                            <input type="hidden" name="_template" value="table">
+                                            <input type="hidden" name="_autoresponse" value="Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.">
+                                            <input type="text" name="name" placeholder="Votre Nom" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <input type="email" name="email" placeholder="Votre E-mail" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px;">
+                                            <textarea name="message" rows="4" placeholder="Votre Message" required style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; resize:vertical;"></textarea>
+                                            <button type="submit" class="btn">Envoyer</button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <h3>Contact</h3>
+                                        <p style="margin:20px 0;"><i class="fas fa-envelope" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.email}</p>
+                                        <p style="margin:20px 0;"><i class="fas fa-phone" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.phone}</p>
+                                        <div class="social-links" style="margin-top:30px;">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" style="color:var(--color-accent); font-size:1.5rem; margin-right:15px;"><i class="fab fa-${k}"></i></a>`).join('')}</div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </main>
+                    <footer><p>${data.contact.footerText}</p></footer>
+                </div>`
+        },
 
-    // --- 2. DOM Elements (Références aux éléments de la page) ---
+        'medical': {
+            name: 'Cabinet Médical',
+            defaults: { colorAccent: '#2ecc71', colorHeading: '#2c3e50', colorText: '#34495e', colorBg: '#f8fdff', colorSurface: '#ffffff', fontFamily: 'roboto' },
+            render: (data, activePage) => `
+                <div class="template-medical">
+                    <header>
+                        <div class="header-top">
+                            <div class="logo">${data.general.siteTitle}</div>
+                            <div class="contact-info">
+                                <span><i class="fas fa-phone"></i> ${data.general.phone}</span>
+                                <span><i class="fas fa-clock"></i> ${data.contact.horaires}</span>
+                            </div>
+                        </div>
+                        <nav><ul>
+                            <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Accueil</a></li>
+                            <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Spécialités</a></li>
+                            <li><a href="#apropos" data-page="apropos" class="${activePage === 'apropos' ? 'active' : ''}">Le Docteur</a></li>
+                            <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Rendez-vous</a></li>
+                        </ul></nav>
+                    </header>
+                    <main>
+                        <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
+                            <section class="hero" style="background: linear-gradient(135deg, var(--color-accent-overlay), var(--color-accent-overlay)), url('${data.accueil.heroImage}'); background-size: cover; background-position: center;">
+                                <div class="hero-content">
+                                    <h1 style="font-size: 2.5rem; margin-bottom: 20px;">${data.accueil.heroTitle}</h1>
+                                    <p style="font-size: 1.2rem; margin-bottom: 30px;">${data.accueil.heroSubtitle}</p>
+                                    <a href="${data.accueil.ctaLink}" class="btn" style="background: white; color: var(--color-accent); padding: 15px 30px;">${data.accueil.ctaText}</a>
+                                </div>
+                            </section>
+                            <section class="section"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'services' ? 'active' : ''}" id="page-services">
+                            <section class="section"><h2>${data.services.pageTitle}</h2><div class="services-grid">${data.services.items.map(i => `<div class="service-card"><div class="service-icon"><i class="fas fa-stethoscope"></i></div><h3>${i.name}</h3><p>${i.desc}</p></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'apropos' ? 'active' : ''}" id="page-apropos">
+                            <section class="section"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto 40px; font-size:1.1rem;">${data.apropos.text}</p>
+                                <div class="features-grid">
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-bullseye"></i></div><h3>Notre Mission</h3><p>${data.apropos.mission}</p></div>
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-eye"></i></div><h3>Notre Vision</h3><p>${data.apropos.vision}</p></div>
+                                </div>
+                                <div style="text-align:center; margin-top:40px;"><h3>Nos Valeurs</h3><div style="display:flex; justify-content:center; gap:30px; margin-top:20px; flex-wrap:wrap;">${data.apropos.values.map(v => `<span style="background:var(--color-accent); color:white; padding:10px 20px; border-radius:25px;">${v}</span>`).join('')}</div></div>
+                                <div style="text-align:center; margin-top:40px;"><img src="${data.apropos.teamImage}" alt="Notre équipe" style="max-width:600px; width:100%; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.1);"></div>
+                            </section>
+                        </div>
+                        <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><div style="max-width:600px; margin:0 auto; text-align:center;"><p style="margin-bottom:30px;">${data.contact.introText}</p><div style="background:var(--color-surface); padding:30px; border-radius:10px;"><h3>Informations pratiques</h3><p style="margin:15px 0;"><i class="fas fa-map-marker-alt" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.address}</p><p style="margin:15px 0;"><i class="fas fa-phone" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.phone}</p><p style="margin:15px 0;"><i class="fas fa-envelope" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.email}</p><p><i class="fas fa-clock" style="color:var(--color-accent); margin-right:10px;"></i>${data.contact.horaires}</p></div></div></section>
+                        </div>
+                    </main>
+                    <footer style="background: var(--color-surface); text-align: center; padding: 30px;"><div class="social-links" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" aria-label="${k}" style="color: var(--color-accent); font-size: 1.5rem; transition: color 0.3s;"><i class="fab fa-${k}"></i></a>`).join('')}</div><p>${data.contact.footerText}</p></footer>
+                </div>`
+        },
+        'ecommerce': {
+            name: 'Boutique E-commerce',
+            defaults: { colorAccent: '#e74c3c', colorHeading: '#ffffff', colorText: '#ffffff', colorBg: '#0a0a0a', colorSurface: '#1a1a1a', fontFamily: 'montserrat' },
+            render: (data, activePage) => `
+                <div class="template-ecommerce">
+                    <header>
+                        <div class="header-content">
+                            <div class="logo">${data.general.siteTitle}</div>
+                            <div class="header-actions">
+                                <div class="header-icons">
+                                    <div class="header-icon"><i class="fas fa-user"></i></div>
+                                    <div class="header-icon"><i class="fas fa-shopping-cart"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                    <nav><ul>
+                        <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Accueil</a></li>
+                        <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Produits</a></li>
+                        <li><a href="#apropos" data-page="apropos" class="${activePage === 'apropos' ? 'active' : ''}">Notre Marque</a></li>
+                        <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Contact</a></li>
+                    </ul></nav>
+                    <main>
+                        <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
+                            <section class="hero" style="background: linear-gradient(135deg, var(--color-accent-overlay), var(--color-accent-overlay)), url('${data.accueil.heroImage}'); background-size: cover; background-position: center;">
+                                <div class="hero-content">
+                                    <h1 style="font-size: 2.8rem; margin-bottom: 20px;">${data.accueil.heroTitle}</h1>
+                                    <p style="font-size: 1.2rem; margin-bottom: 30px;">${data.accueil.heroSubtitle}</p>
+                                    <a href="${data.accueil.ctaLink}" class="btn" style="background: white; color: var(--color-accent); padding: 15px 30px; font-weight: bold;">${data.accueil.ctaText}</a>
+                                </div>
+                            </section>
+                            <section class="section"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'services' ? 'active' : ''}" id="page-services">
+                            <section class="section"><h2>${data.services.pageTitle}</h2><div class="products-grid">${data.services.items.map(i => `<div class="product-card"><img src="${i.image}" alt="${i.name}" class="product-image"><div class="product-info"><h3>${i.name}</h3><p>${i.desc}</p><div class="product-price">${i.price}</div><button class="btn-cart">Ajouter au panier</button></div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'apropos' ? 'active' : ''}" id="page-apropos">
+                            <section class="section"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto 40px; font-size:1.1rem;">${data.apropos.text}</p>
+                                <div class="features-grid">
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-bullseye"></i></div><h3>Notre Mission</h3><p>${data.apropos.mission}</p></div>
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-eye"></i></div><h3>Notre Vision</h3><p>${data.apropos.vision}</p></div>
+                                </div>
+                                <div style="text-align:center; margin-top:40px;"><h3>Nos Valeurs</h3><div style="display:flex; justify-content:center; gap:30px; margin-top:20px; flex-wrap:wrap;">${data.apropos.values.map(v => `<span style="background:var(--color-accent); color:white; padding:10px 20px; border-radius:25px;">${v}</span>`).join('')}</div></div>
+                            </section>
+                        </div>
+                        <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><div style="max-width:600px; margin:0 auto; text-align:center;"><p style="margin-bottom:30px;">${data.contact.introText}</p><div style="background:rgba(231,76,60,0.1); padding:30px; border-radius:15px;"><p style="margin:15px 0; color:var(--color-accent);"><i class="fas fa-map-marker-alt" style="margin-right:10px;"></i>${data.general.address}</p><p style="margin:15px 0; color:var(--color-accent);"><i class="fas fa-envelope" style="margin-right:10px;"></i>${data.general.email}</p><p style="margin:15px 0; color:var(--color-accent);"><i class="fas fa-phone" style="margin-right:10px;"></i>${data.general.phone}</p><p style="color:var(--color-accent);"><i class="fas fa-clock" style="margin-right:10px;"></i>${data.contact.horaires}</p></div></div></section>
+                        </div>
+                    </main>
+                    <footer style="background: var(--color-surface); text-align: center; padding: 30px;"><div class="social-links" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" aria-label="${k}" style="color: #666; font-size: 1.5rem; transition: color 0.3s;"><i class="fab fa-${k}"></i></a>`).join('')}</div><p style="color: #666;">${data.contact.footerText}</p></footer>
+                </div>`
+        }
+    };
     const DOM = {
         tabs: document.querySelectorAll('.tab-btn'), tabContent: document.getElementById('tabContent'), preview: document.getElementById('websitePreview'),
-        exportJsonBtn: document.getElementById('exportJsonBtn')
+        exportJsonBtn: document.getElementById('exportJsonBtn'),
+        toggleBtn: document.getElementById('toggleBtn'),
+        customizer: document.getElementById('customizer'),
+        resizeHandle: document.getElementById('resizeHandle')
     };
     let currentCustomizerPage = 'general', currentPreviewPage = 'accueil';
-
-    // --- 3. CORE FUNCTIONS (Logique principale) ---
+    let updateTimeout = null;
 
     const updateState = (path, value) => {
         path.split('.').reduce((acc, key, i, arr) => {
             if (i === arr.length - 1) {
-                acc[key] = value;
+                if (path === 'apropos.values' && typeof value === 'string') {
+                    acc[key] = value.split(',').map(v => v.trim()).filter(v => v);
+                } else {
+                    acc[key] = value;
+                }
             }
-            return acc[key];
+            return acc[key] || {};
         }, websiteData);
-        if (path.startsWith('general.color') || path === 'general.theme') applyTheme();
-        renderPreview(currentPreviewPage);
+        
+        if (path.startsWith('general.color') || path === 'general.theme' || path.startsWith('general.font')) applyTheme();
+        
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(() => {
+            renderPreview(currentPreviewPage);
+        }, 500);
     };
-
+    
+    const updateTabsForTemplate = (templateId) => {
+        const tabsContainer = document.getElementById('tabsContainer');
+        const accueilTab = tabsContainer.querySelector('[data-page="accueil"]');
+        const servicesTab = tabsContainer.querySelector('[data-page="services"]');
+        const aproposTab = tabsContainer.querySelector('[data-page="apropos"]');
+        const galerieTab = tabsContainer.querySelector('[data-page="galerie"]');
+        const temoignagesTab = tabsContainer.querySelector('[data-page="temoignages"]');
+        const contactTab = tabsContainer.querySelector('[data-page="contact"]');
+        
+        [accueilTab, servicesTab, aproposTab, galerieTab, temoignagesTab, contactTab].forEach(tab => {
+            if (tab) tab.style.display = 'block';
+        });
+        
+        if (templateId === 'artisan') {
+            accueilTab.textContent = 'Accueil';
+            servicesTab.textContent = 'Services';
+            aproposTab.textContent = 'À Propos';
+            galerieTab.textContent = 'Galerie';
+            contactTab.textContent = 'Contact';
+        } else if (templateId === 'corporate') {
+            accueilTab.textContent = 'Accueil';
+            servicesTab.textContent = 'Services';
+            aproposTab.textContent = 'À Propos';
+            galerieTab.textContent = 'Réalisations';
+            contactTab.textContent = 'Contact';
+            if (temoignagesTab) temoignagesTab.style.display = 'none';
+        } else if (templateId === 'portfolio') {
+            accueilTab.textContent = 'Portfolio';
+            servicesTab.textContent = 'Services';
+            aproposTab.textContent = 'À Propos';
+            contactTab.textContent = 'Contact';
+            if (galerieTab) galerieTab.style.display = 'none';
+            if (temoignagesTab) temoignagesTab.style.display = 'none';
+        } else if (templateId === 'medical') {
+            accueilTab.textContent = 'Accueil';
+            servicesTab.textContent = 'Spécialités';
+            aproposTab.textContent = 'Le Docteur';
+            contactTab.textContent = 'RDV';
+            if (galerieTab) galerieTab.style.display = 'none';
+            if (temoignagesTab) temoignagesTab.style.display = 'none';
+        } else if (templateId === 'ecommerce') {
+            accueilTab.textContent = 'Accueil';
+            servicesTab.textContent = 'Produits';
+            aproposTab.textContent = 'Notre Marque';
+            contactTab.textContent = 'Contact';
+            if (galerieTab) galerieTab.style.display = 'none';
+            if (temoignagesTab) temoignagesTab.style.display = 'none';
+        }
+        
+        DOM.tabs = document.querySelectorAll('.tab-btn');
+    };
+    
     const switchTab = (page) => {
         currentCustomizerPage = page;
         DOM.tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.page === page));
@@ -181,7 +741,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const createFormGroup = (path, label, type = 'text', options = {}) => {
-        const value = path.split('.').reduce((acc, key) => acc && acc[key], websiteData);
+        let value = path.split('.').reduce((acc, key) => acc && acc[key], websiteData) ?? '';
+        
+        if (path === 'apropos.values' && Array.isArray(value)) {
+            value = value.join(', ');
+        }
+        
         const group = document.createElement('div');
         group.className = `form-group ${type === 'color' ? 'color-input' : ''}`;
         
@@ -211,116 +776,333 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return group;
     };
-
     const renderCustomizerForm = (page) => {
         DOM.tabContent.innerHTML = '';
         const fragment = document.createDocumentFragment();
         const addField = (path, label, type, options) => fragment.appendChild(createFormGroup(path, label, type, options));
         const addDivider = () => { const hr = document.createElement('hr'); hr.className = 'form-divider'; fragment.appendChild(hr); };
-        const addSubheading = (text) => { const h = document.createElement('h4'); h.textContent = text; fragment.appendChild(h); };
+        const addSubheading = (text) => { const h = document.createElement('h4'); h.style.marginBottom='10px'; h.textContent = text; fragment.appendChild(h); };
 
         switch (page) {
-             case 'general':
-                addField('general.siteTitle', 'Titre du site'); addField('general.headerSubtext', 'Slogan / Texte en-tête');
-                addField('general.theme', 'Thème de base', 'select', { choices: [{value: 'light', text: 'Clair'}, {value: 'dark', text: 'Sombre'}]});
+            case 'general':
+                const templateChoices = Object.keys(templates).map(id => ({ value: id, text: templates[id].name }));
+                addField('general.templateId', 'Template du Site', 'select', { choices: templateChoices });
+                
+                const templateSelect = fragment.querySelector('#general\\.templateId');
+                if (templateSelect) {
+                    templateSelect.addEventListener('change', (e) => {
+                        const template = templates[e.target.value];
+                        if (template) {
+                            websiteData.general.templateId = e.target.value;
+                            Object.assign(websiteData.general, template.defaults);
+                            updateTabsForTemplate(e.target.value);
+                            applyTheme();
+                            renderPreview(currentPreviewPage);
+                            renderCustomizerForm(currentCustomizerPage);
+                        }
+                    });
+                }
+                
+                addField('general.siteTitle', 'Nom de l\'entreprise'); 
+                addField('general.headerSubtext', 'Slogan / Baseline');
+                addField('general.phone', 'Téléphone'); 
+                addField('general.email', 'Email principal'); 
+                addField('general.address', 'Adresse complète', 'textarea');
                 addDivider();
-                addSubheading('Palette de Couleurs');
-                addField('general.colorAccent', 'Accent (boutons, liens)', 'color'); addField('general.colorHeading', 'Titres', 'color'); addField('general.colorText', 'Texte courant', 'color');
-                addField('general.colorBg', 'Fond des pages', 'color'); addField('general.colorSurface', 'Surface (cartes, en-tête)', 'color');
+                addSubheading('Couleurs');
+                addField('general.colorAccent', 'Couleur principale', 'color'); 
+                addField('general.colorHeroTitle', 'Couleur titre', 'color');
+                addField('general.colorHeroSubtitle', 'Couleur sous-titre', 'color');
+                addField('general.colorHeading', 'Couleur titre de paragraphe', 'color');
+                addField('general.colorText', 'Texte', 'color');
+                addField('general.colorBg', 'Arrière-plan', 'color'); 
+                addField('general.colorSurface', 'Surfaces', 'color');
+                addDivider();
+                
+                if (websiteData.general.templateId === 'medical' || websiteData.general.templateId === 'ecommerce') {
+                    addSubheading('Thème');
+                    const themeChoices = [
+                        { value: 'light', text: 'Clair' },
+                        { value: 'dark', text: 'Sombre' }
+                    ];
+                    addField('general.theme', 'Mode d\'affichage', 'select', { choices: themeChoices });
+                    addDivider();
+                }
+                
+                addSubheading('Typographie');
+                const fontChoices = [
+                    { value: 'system', text: 'Système (défaut)' },
+                    { value: 'roboto', text: 'Roboto (moderne)' },
+                    { value: 'playfair', text: 'Playfair (élégant)' },
+                    { value: 'montserrat', text: 'Montserrat (clean)' }
+                ];
+                addField('general.fontFamily', 'Police de caractères', 'select', { choices: fontChoices });
                 break;
             case 'accueil':
-                addField('accueil.heroTitle', 'Titre principal'); addField('accueil.heroSubtitle', 'Sous-titre', 'textarea'); addField('accueil.heroImage', 'URL de l\'image de fond', 'text', {placeholder:'https://...'});
-                addField('accueil.ctaText', 'Texte du bouton d\'action'); addField('accueil.ctaLink', 'Lien du bouton (ex: #contact)');
-                addDivider();
-                addField('accueil.aboutTitle', 'Titre section "A Propos"'); addField('accueil.aboutText', 'Texte "A Propos"', 'textarea');
+                if (websiteData.general.templateId === 'portfolio') {
+                    addField('galerie.pageTitle', 'Titre du portfolio');
+                    addField('galerie.intro', 'Texte d\'introduction', 'textarea');
+                    websiteData.galerie.images.forEach((_, i) => { 
+                        addDivider(); addSubheading(`Réalisation ${i + 1}`);
+                        addField(`galerie.images.${i}.url`, 'Image (URL)'); 
+                        addField(`galerie.images.${i}.caption`, 'Description');
+                    });
+                } else {
+                    addField('accueil.heroTitle', 'Titre principal'); 
+                    addField('accueil.heroSubtitle', 'Sous-titre', 'textarea'); 
+                    addField('accueil.heroImage', 'Image de fond (URL)');
+                    addField('accueil.ctaText', 'Texte du bouton'); 
+                    addField('accueil.ctaLink', 'Lien du bouton');
+                    addDivider();
+                    addSubheading('Statistiques');
+                    websiteData.accueil.stats.forEach((_, i) => {
+                        addField(`accueil.stats.${i}.number`, `Chiffre ${i + 1}`);
+                        addField(`accueil.stats.${i}.label`, `Label ${i + 1}`);
+                    });
+                }
                 break;
-            case 'catalogue':
-                addField('catalogue.pageTitle', 'Titre de la page');
-                websiteData.catalogue.items.forEach((_, i) => { addDivider(); addSubheading(`Article ${i + 1}`);
-                    addField(`catalogue.items.${i}.name`, 'Nom'); addField(`catalogue.items.${i}.desc`, 'Description', 'textarea');
-                    addField(`catalogue.items.${i}.price`, 'Prix'); addField(`catalogue.items.${i}.image`, 'URL Image', 'text', {placeholder:'https://...'});
-                });
+            case 'services':
+                const currentTemplate = websiteData.general.templateId;
+                if (currentTemplate === 'medical') {
+                    addField('services.pageTitle', 'Nos spécialités');
+                    websiteData.services.items.forEach((_, i) => { 
+                        addDivider(); addSubheading(`Spécialité ${i + 1}`);
+                        addField(`services.items.${i}.name`, 'Nom de la spécialité'); 
+                        addField(`services.items.${i}.desc`, 'Description', 'textarea');
+                    });
+                } else if (currentTemplate === 'ecommerce') {
+                    addField('services.pageTitle', 'Nos produits');
+                    websiteData.services.items.forEach((_, i) => { 
+                        addDivider(); addSubheading(`Produit ${i + 1}`);
+                        addField(`services.items.${i}.name`, 'Nom du produit'); 
+                        addField(`services.items.${i}.desc`, 'Description du produit', 'textarea');
+                        addField(`services.items.${i}.price`, 'Prix'); 
+                        addField(`services.items.${i}.image`, 'Image du produit (URL)');
+                    });
+                } else {
+                    addField('services.pageTitle', 'Titre de la page');
+                    addField('services.intro', 'Texte d\'introduction', 'textarea');
+                    addField('services.heroImage', 'Image de fond services (URL)');
+                    addField('services.testimonialText', 'Témoignage', 'textarea');
+                    addField('services.testimonialAuthor', 'Auteur du témoignage');
+                    websiteData.services.items.forEach((_, i) => { 
+                        addDivider(); addSubheading(`Service ${i + 1}`);
+                        addField(`services.items.${i}.name`, 'Nom du service'); 
+                        addField(`services.items.${i}.desc`, 'Description', 'textarea');
+                        addField(`services.items.${i}.price`, 'Prix'); 
+                        addField(`services.items.${i}.image`, 'Image (URL)');
+                    });
+                }
+                break;
+            case 'apropos':
+                const templateType = websiteData.general.templateId;
+                if (templateType === 'medical') {
+                    addField('apropos.title', 'Le Docteur');
+                    addField('apropos.text', 'Présentation du praticien', 'textarea');
+                    addField('apropos.mission', 'Approche médicale', 'textarea');
+                    addField('apropos.vision', 'Vision des soins', 'textarea');
+                    addField('apropos.values', 'Valeurs médicales (séparées par des virgules)');
+                    addField('apropos.teamImage', 'Photo du cabinet/équipe (URL)');
+                } else if (templateType === 'ecommerce') {
+                    addField('apropos.title', 'Notre marque');
+                    addField('apropos.text', 'Histoire de la marque', 'textarea');
+                    addField('apropos.mission', 'Notre mission commerciale', 'textarea');
+                    addField('apropos.vision', 'Notre vision business', 'textarea');
+                    addField('apropos.values', 'Nos valeurs (séparées par des virgules)');
+                } else {
+                    addField('apropos.title', 'Titre de la section');
+                    addField('apropos.text', 'Présentation de l\'entreprise', 'textarea');
+                    addField('apropos.mission', 'Notre mission', 'textarea');
+                    addField('apropos.vision', 'Notre vision', 'textarea');
+                    addField('apropos.teamImage', 'Image de l\'équipe (URL)');
+                    addField('apropos.foundedYear', 'Année de création');
+                    addField('apropos.employeeCount', 'Nombre d\'employés');
+                    addField('apropos.projectsCompleted', 'Projets réalisés');
+                }
                 break;
             case 'galerie':
                 addField('galerie.pageTitle', 'Titre de la page');
-                websiteData.galerie.images.forEach((_, i) => { addDivider(); addSubheading(`Image ${i + 1}`);
-                    addField(`galerie.images.${i}.url`, 'URL Image', 'text', {placeholder:'https://...'}); addField(`galerie.images.${i}.caption`, 'Légende');
+                addField('galerie.intro', 'Texte d\'introduction', 'textarea');
+                websiteData.galerie.images.forEach((_, i) => { 
+                    addDivider(); addSubheading(`Réalisation ${i + 1}`);
+                    addField(`galerie.images.${i}.url`, 'Image (URL)'); 
+                    addField(`galerie.images.${i}.caption`, 'Description');
                 });
                 break;
             case 'temoignages':
                 addField('temoignages.title', 'Titre de la section');
-                websiteData.temoignages.items.forEach((_, i) => { addDivider(); addSubheading(`Témoignage ${i + 1}`);
-                    addField(`temoignages.items.${i}.text`, 'Texte', 'textarea'); addField(`temoignages.items.${i}.author`, 'Auteur');
+                addField('temoignages.intro', 'Texte d\'introduction', 'textarea');
+                websiteData.temoignages.items.forEach((_, i) => { 
+                    addDivider(); addSubheading(`Témoignage ${i + 1}`);
+                    addField(`temoignages.items.${i}.text`, 'Témoignage', 'textarea'); 
+                    addField(`temoignages.items.${i}.author`, 'Nom du client');
+                    addField(`temoignages.items.${i}.company`, 'Entreprise/Fonction');
                 });
                 break;
             case 'contact':
-                addField('contact.pageTitle', 'Titre de la page'); addField('contact.introText', 'Texte d\'introduction', 'textarea');
-                addDivider();
-                addField('contact.address', 'Adresse'); addField('contact.phone', 'Téléphone'); addField('contact.email', 'E-mail');
-                addField('contact.mapUrl', 'URL d\'intégration Google Maps', 'textarea');
+                const contactTemplateId = websiteData.general.templateId;
+                if (contactTemplateId === 'medical') {
+                    addField('contact.pageTitle', 'Prendre rendez-vous');
+                    addField('contact.introText', 'Message pour les patients', 'textarea');
+                    addField('contact.horaires', 'Horaires de consultation');
+                    addDivider();
+                    addSubheading('Informations pratiques');
+                    addField('general.address', 'Adresse du cabinet', 'textarea');
+                    addField('general.phone', 'Téléphone');
+                    addField('general.email', 'Email');
+                } else if (contactTemplateId === 'ecommerce') {
+                    addField('contact.pageTitle', 'Nous contacter');
+                    addField('contact.introText', 'Message de contact', 'textarea');
+                    addField('contact.horaires', 'Horaires service client');
+                    addDivider();
+                    addSubheading('Service client');
+                    addField('general.address', 'Adresse', 'textarea');
+                    addField('general.phone', 'Téléphone');
+                    addField('general.email', 'Email support');
+                } else {
+                    addField('contact.pageTitle', 'Titre de la page');
+                    addField('contact.introText', 'Texte d\'introduction', 'textarea');
+                    addField('contact.formTitle', 'Titre du formulaire');
+                    addField('contact.horaires', 'Horaires d\'ouverture');
+                }
                 addDivider();
                 addSubheading('Réseaux Sociaux');
-                addField('contact.social.facebook', 'Lien Facebook', 'text', {placeholder:'https://...'}); addField('contact.social.instagram', 'Lien Instagram', 'text', {placeholder:'https://...'}); addField('contact.social.linkedin', 'Lien LinkedIn', 'text', {placeholder:'https://...'});
+                addField('contact.social.facebook', 'Facebook (URL)'); 
+                addField('contact.social.linkedin', 'LinkedIn (URL)'); 
+                addField('contact.social.twitter', 'Twitter (URL)');
                 addDivider();
                 addField('contact.footerText', 'Texte du pied de page');
+                break;
+            case 'ameliorations':
+                addSubheading('Modules Additionnels');
+                const modules = [
+                    { key: 'blog', label: 'Blog / Articles' },
+                    { key: 'ecommerce', label: 'E-commerce / Boutique' },
+                    { key: 'reservation', label: 'Système de réservation' },
+                    { key: 'newsletter', label: 'Newsletter / Mailing' },
+                    { key: 'chatbot', label: 'Chat en ligne' },
+                    { key: 'multilingue', label: 'Site multilingue' },
+                    { key: 'faq', label: 'FAQ / Questions fréquentes' },
+                    { key: 'equipe', label: 'Page équipe' },
+                    { key: 'avis', label: 'Système d\'avis clients' },
+                    { key: 'carte', label: 'Carte interactive' }
+                ];
+                modules.forEach(module => {
+                    const group = document.createElement('div');
+                    group.className = 'checkbox-group';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `ameliorations.modulesAdditionnels.${module.key}`;
+                    checkbox.checked = websiteData.ameliorations.modulesAdditionnels[module.key];
+                    const label = document.createElement('label');
+                    label.htmlFor = checkbox.id;
+                    label.textContent = module.label;
+                    label.style.cursor = 'pointer';
+                    group.appendChild(checkbox);
+                    group.appendChild(label);
+                    checkbox.addEventListener('change', e => {
+                        updateState(`ameliorations.modulesAdditionnels.${module.key}`, e.target.checked);
+                    });
+                    fragment.appendChild(group);
+                });
+                addDivider();
+                addSubheading('Animations');
+                const animations = [
+                    { key: 'parallax', label: 'Effet parallax' },
+                    { key: 'fadeIn', label: 'Apparition en fondu' },
+                    { key: 'slideIn', label: 'Glissement latéral' }
+                ];
+                animations.forEach(anim => {
+                    const group = document.createElement('div');
+                    group.className = 'checkbox-group';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `ameliorations.animations.${anim.key}`;
+                    checkbox.checked = websiteData.ameliorations.animations[anim.key];
+                    const label = document.createElement('label');
+                    label.htmlFor = checkbox.id;
+                    label.textContent = anim.label;
+                    label.style.cursor = 'pointer';
+                    group.appendChild(checkbox);
+                    group.appendChild(label);
+                    checkbox.addEventListener('change', e => {
+                        updateState(`ameliorations.animations.${anim.key}`, e.target.checked);
+                    });
+                    fragment.appendChild(group);
+                });
+                addDivider();
+                addField('ameliorations.commandeSpeciale', 'Commande spéciale', 'textarea', { placeholder: 'Décrivez vos besoins spécifiques...' });
                 break;
         }
         DOM.tabContent.appendChild(fragment);
     };
-
+    
     const renderPreview = (activePage = 'accueil') => {
         currentPreviewPage = activePage;
-        const data = websiteData;
-        const navLinks = [
-            { id: 'accueil', text: 'Accueil' }, { id: 'catalogue', text: data.catalogue.pageTitle.split(' ')[0] || 'Catalogue' },
-            { id: 'galerie', text: 'Galerie' }, { id: 'contact', text: 'Contact' }
-        ];
-
-        DOM.preview.innerHTML = `
-            <header><nav>
-                <div class="logo-container"><div class="logo">${data.general.siteTitle}</div><div class="subtext">${data.general.headerSubtext}</div></div>
-                <ul>${navLinks.map(l => `<li><a href="#${l.id}" data-page="${l.id}" class="${activePage === l.id ? 'active' : ''}">${l.text}</a></li>`).join('')}</ul>
-            </nav></header>
-            <main>
-                <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
-                    <section class="hero" style="background-image: url('${data.accueil.heroImage}');"><div class="hero-content"><h1>${data.accueil.heroTitle}</h1><p>${data.accueil.heroSubtitle}</p><a href="${data.accueil.ctaLink}" class="btn cta-btn">${data.accueil.ctaText}</a></div></section>
-                    <section class="section about"><h2>${data.accueil.aboutTitle}</h2><p>${data.accueil.aboutText.replace(/\n/g, '<br>')}</p></section>
-                    <section class="section section-alt testimonials"><h2>${data.temoignages.title}</h2><div class="card-grid">${data.temoignages.items.map(t => `<div class="card testimonial-card"><p>"${t.text}"</p><div class="author">- ${t.author}</div></div>`).join('')}</div></section>
-                </div>
-                <div class="page-content ${activePage === 'catalogue' ? 'active' : ''}" id="page-catalogue">
-                    <section class="section"><h2>${data.catalogue.pageTitle}</h2><div class="card-grid">${data.catalogue.items.map(i => `<div class="card catalog-item"><img src="${i.image}" alt="${i.name}"><div class="item-content"><h3>${i.name}</h3><p>${i.desc}</p>${i.price ? `<div class="price">${i.price}</div>` : ''}</div></div>`).join('')}</div></section>
-                </div>
-                <div class="page-content ${activePage === 'galerie' ? 'active' : ''}" id="page-galerie">
-                    <section class="section"><h2>${data.galerie.pageTitle}</h2><div class="gallery-grid">${data.galerie.images.map(i => `<figure class="gallery-item"><img src="${i.url}" alt="${i.caption}"><figcaption>${i.caption}</figcaption></figure>`).join('')}</div></section>
-                </div>
-                <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
-                    <section class="section"><h2>${data.contact.pageTitle}</h2><p style="text-align:center; max-width:700px; margin: 0 auto 40px;">${data.contact.introText}</p>
-                    <div class="contact-grid">
-                        <div class="card contact-info"><h3>Nos coordonnées</h3><p><i class="fas fa-map-marker-alt"></i> ${data.contact.address}</p><p><i class="fas fa-phone"></i> ${data.contact.phone}</p><p><i class="fas fa-envelope"></i> <a href="mailto:${data.contact.email}">${data.contact.email}</a></p></div>
-                        ${data.contact.mapUrl ? `<div class="map-container"><h3>Nous trouver</h3><iframe src="${data.contact.mapUrl}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>` : ''}
-                    </div></section>
-                </div>
-            </main>
-            <footer><div class="social-links">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" aria-label="${k}"><i class="fab fa-${k}"></i></a>`).join('')}</div><p>${data.contact.footerText}</p></footer>`;
+        const templateId = websiteData.general.templateId;
+        const activeTemplate = templates[templateId] || templates['artisan'];
         
-        DOM.preview.querySelectorAll('nav a, .cta-btn').forEach(link => {
-            link.addEventListener('click', e => { e.preventDefault();
-                const targetPage = (link.dataset.page || link.getAttribute('href')).replace('#', '');
-                if (navLinks.map(l => l.id).includes(targetPage)) renderPreview(targetPage);
-            });
-        });
+        const newContent = activeTemplate.render(websiteData, activePage);
+        const previewContainer = document.querySelector('.preview-container');
+        
+        if (DOM.preview.innerHTML !== newContent) {
+            previewContainer.style.opacity = '0.3';
+            
+            setTimeout(() => {
+                DOM.preview.innerHTML = newContent;
+                
+                DOM.preview.querySelectorAll('nav a, .cta-btn').forEach(link => {
+                    link.addEventListener('click', e => {
+                        const href = link.getAttribute('href');
+                        if (href && href.startsWith('#')) {
+                            e.preventDefault();
+                            const targetPage = href.replace('#', '');
+                            renderPreview(targetPage);
+                        }
+                    });
+                });
+                
+                previewContainer.style.opacity = '1';
+            }, 200);
+        }
+    };
+    
+    const hexToRgba = (hex, alpha) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     };
     
     const applyTheme = () => {
-        const data = websiteData.general;
+        const { theme, fontFamily, ...colors } = websiteData.general;
         const root = document.documentElement;
-        root.className = data.theme === 'dark' ? 'dark-theme' : '';
-        Object.entries(data).forEach(([key, value]) => {
+        root.className = theme === 'dark' ? 'dark-theme' : '';
+        Object.entries(colors).forEach(([key, value]) => {
             if (key.startsWith('color')) {
                 const cssVar = `--${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
                 root.style.setProperty(cssVar, value);
+                if (key === 'colorAccent') {
+                    root.style.setProperty('--color-accent-overlay', hexToRgba(value, 0.9));
+                }
             }
         });
+        
+        const fontMap = {
+            'system': 'var(--font-main)',
+            'roboto': '"Roboto", sans-serif',
+            'playfair': '"Playfair Display", serif',
+            'montserrat': '"Montserrat", sans-serif'
+        };
+        root.style.setProperty('--font-main', fontMap[fontFamily] || fontMap.system);
+        
+        if (fontFamily !== 'system') {
+            const link = document.getElementById('google-fonts') || document.createElement('link');
+            link.id = 'google-fonts';
+            link.rel = 'stylesheet';
+            link.href = `https://fonts.googleapis.com/css2?family=${fontFamily === 'roboto' ? 'Roboto:wght@300;400;500;700' : fontFamily === 'playfair' ? 'Playfair+Display:wght@400;500;700' : 'Montserrat:wght@300;400;500;700'}&display=swap`;
+            document.head.appendChild(link);
+        }
     };
 
     const exportJson = () => {
@@ -329,16 +1111,51 @@ document.addEventListener('DOMContentLoaded', () => {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = 'config-site.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         URL.revokeObjectURL(a.href);
     };
 
-    // --- 4. INITIALIZATION (Lancement de l'application) ---
     DOM.tabs.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.page)));
     DOM.exportJsonBtn.addEventListener('click', exportJson);
     
+    DOM.toggleBtn.addEventListener('click', () => {
+        DOM.customizer.classList.toggle('collapsed');
+        DOM.toggleBtn.classList.toggle('collapsed');
+        const icon = DOM.toggleBtn.querySelector('i');
+        icon.className = DOM.customizer.classList.contains('collapsed') ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+        
+        const preview = document.querySelector('.preview');
+        if (DOM.customizer.classList.contains('collapsed')) {
+            preview.style.paddingLeft = '60px';
+            preview.style.paddingRight = '60px';
+        } else {
+            preview.style.paddingLeft = '20px';
+            preview.style.paddingRight = '20px';
+        }
+    });
+    
+    let isResizing = false;
+    DOM.resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.addEventListener('mousemove', handleResize);
+        document.addEventListener('mouseup', stopResize);
+    });
+    
+    function handleResize(e) {
+        if (!isResizing) return;
+        const newWidth = Math.min(Math.max(e.clientX, 300), 600);
+        DOM.customizer.style.width = newWidth + 'px';
+        DOM.toggleBtn.style.left = newWidth + 'px';
+        e.preventDefault();
+    }
+    
+    function stopResize() {
+        isResizing = false;
+        document.removeEventListener('mousemove', handleResize);
+        document.removeEventListener('mouseup', stopResize);
+    }
+
+    updateTabsForTemplate(websiteData.general.templateId);
     applyTheme();
     switchTab(currentCustomizerPage);
     renderPreview(currentPreviewPage);
