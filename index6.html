@@ -16,8 +16,13 @@
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: var(--font-main); background-color: #eef1f3; color: #333; line-height: 1.6; }
-    .container { display: flex; height: 100vh; }
-    .customizer { width: 420px; background: #fff; padding: 25px; box-shadow: var(--shadow-md); overflow-y: auto; display: flex; flex-direction: column; z-index: 10; }
+    .container { display: flex; height: 100vh; position: relative; }
+    .customizer { width: 420px; background: #fff; padding: 25px; box-shadow: var(--shadow-md); overflow-y: auto; display: flex; flex-direction: column; z-index: 10; transition: width 0.3s, margin-left 0.3s; resize: horizontal; min-width: 300px; max-width: 600px; }
+    .customizer.collapsed { width: 0; margin-left: -420px; padding: 0; }
+    .toggle-btn { position: fixed; top: 20px; left: 420px; z-index: 1001; background: var(--color-accent); color: white; border: none; width: 40px; height: 40px; border-radius: 0 8px 8px 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: left 0.3s; box-shadow: 2px 2px 10px rgba(0,0,0,0.2); }
+    .toggle-btn.collapsed { left: 0; border-radius: 0 8px 8px 0; }
+    .resize-handle { position: absolute; top: 0; right: 0; width: 5px; height: 100%; background: var(--color-accent); cursor: ew-resize; opacity: 0; transition: opacity 0.2s; }
+    .customizer:hover .resize-handle { opacity: 0.5; }
     .customizer h2 { margin-bottom: 20px; border-bottom: 2px solid var(--color-accent); padding-bottom: 10px; color: black; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
     .form-group { margin-bottom: 18px; }
     .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #34495e; font-size: 0.9rem; }
@@ -27,10 +32,15 @@
     .form-group.color-input { display: flex; align-items: center; justify-content: space-between; }
     .form-group.color-input input[type="color"] { width: 50px; height: 35px; padding: 2px; border: none; background: none; cursor: pointer; }
     .form-group.color-input .color-value { font-family: monospace; background: #f1f1f1; padding: 5px 8px; border-radius: 4px; }
+    .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .checkbox-group input[type="checkbox"] { width: auto; margin: 0; }
+    .checkbox-group label { margin: 0; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     .tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 20px; }
     .tabs button { padding: 12px 5px; cursor: pointer; background: #f9f9f9; border: 1px solid #ddd; font-weight: 600; transition: all 0.3s; border-radius: 5px; font-size:0.9rem; flex-grow: 1; }
     .tabs button.active { background: var(--color-accent); color: white; border-color: var(--color-accent); }
-    .preview { flex: 1; padding: 20px; background-color: #dce3e9; display: flex; justify-content: center; align-items: center; }
+    .preview { flex: 1; padding: 20px; background-color: #dce3e9; display: flex; justify-content: center; align-items: center; transition: padding 0.3s; }
+    .customizer.collapsed + .preview { padding: 20px; }
+    .preview-container { transition: opacity 0.4s ease-in-out; }
     .preview-frame { width: 100%; height: 100%; display: flex; flex-direction: column; }
     .preview-container { width: 100%; flex: 1; border: 8px solid #333; border-radius: 10px; background: var(--color-bg); color: var(--color-text); box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; }
     .btn { display: inline-block; padding: 12px 25px; background: var(--color-accent); color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; text-align: center; text-decoration: none; transition: all 0.3s; font-size: 1rem; }
@@ -70,7 +80,12 @@
 
     /* === STYLES TEMPLATE: ARTISAN (Défaut) === */
     .template-artisan header { position: sticky; top: 0; z-index: 1000; background: var(--color-surface); box-shadow: var(--shadow-sm); }
-    .template-artisan nav { display:flex; justify-content:space-between; align-items:center; padding: 15px 5%; }
+    .template-artisan nav { display:flex; justify-content:space-between; align-items:center; padding: 15px 5%; flex-wrap: wrap; gap: 15px; }
+    @media (max-width: 768px) {
+        .template-artisan nav { flex-direction: column; text-align: center; }
+        .template-artisan nav ul { flex-wrap: wrap; justify-content: center; }
+        .template-artisan .contact-info { justify-content: center; }
+    }
     .template-artisan .logo-container .logo { font-size:1.6rem; font-weight:700; color: var(--color-accent); }
     .template-artisan .logo-container .subtext { font-size: 0.9rem; color: var(--color-text); opacity: 0.8; }
     .template-artisan nav ul { list-style:none; display:flex; gap:30px; }
@@ -94,7 +109,13 @@
 
     /* === STYLES TEMPLATE: CORPORATE MODERNE === */
     .template-corporate { font-family: 'Poppins', var(--font-main); }
-    .template-corporate header { background: var(--color-bg); border-bottom: 1px solid var(--border-color); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+    .template-corporate header { background: var(--color-bg); border-bottom: 1px solid var(--border-color); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 15px; }
+    @media (max-width: 768px) {
+        .template-corporate header { flex-direction: column; text-align: center; }
+        .template-corporate nav ul { flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .template-corporate .hero { grid-template-columns: 1fr; text-align: center; }
+        .template-corporate .hero-image { order: -1; max-width: 400px; margin: 0 auto; }
+    }
     .template-corporate .logo { font-size: 1.8rem; font-weight: 600; color: var(--color-heading); }
     .template-corporate nav ul { list-style: none; display: flex; gap: 25px; }
     .template-corporate nav a { text-decoration: none; color: var(--color-text); font-weight: 500; position: relative; padding: 5px 0; }
@@ -106,6 +127,9 @@
     .template-corporate .hero-image { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; box-shadow: var(--shadow-md); }
     .template-corporate h2 { text-align: center; font-size: 2.2rem; margin-bottom: 40px; }
     .template-corporate footer { background-color: var(--color-surface); color: var(--color-text); border-top: 1px solid var(--border-color); }
+    .template-corporate .social-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; }
+    .template-corporate .social-links a { color: var(--color-text); font-size: 1.5rem; transition: color 0.3s; }
+    .template-corporate .social-links a:hover { color: var(--color-accent); }
 
     /* === STYLES TEMPLATE: PORTFOLIO CRÉATIF === */
     .template-portfolio { background-color: var(--color-bg); }
@@ -128,11 +152,76 @@
     .template-portfolio .gallery-item:hover figcaption { transform: translateY(0); }
     .template-portfolio .section { max-width: 900px; margin: 0 auto; }
     .template-portfolio footer { background: var(--color-bg); color: var(--color-text); font-size: 0.9rem; }
+
+
+
+    /* === STYLES TEMPLATE: MÉDICAL === */
+    .template-medical { background: var(--color-bg); min-height: 100vh; }
+    .template-medical header { background: var(--color-surface); backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); padding: 25px 5%; position: sticky; top: 0; z-index: 1000; }
+    .template-medical .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .template-medical .logo { font-size: 2.2rem; font-weight: 300; color: var(--color-accent); display: flex; align-items: center; gap: 15px; }
+    .template-medical .logo::before { content: '⚕️'; font-size: 2rem; }
+    .template-medical .contact-info { display: flex; gap: 40px; }
+    .template-medical .contact-item { display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: rgba(46,204,113,0.1); border-radius: 25px; color: var(--color-accent); font-weight: 500; }
+    .template-medical nav ul { list-style: none; display: flex; justify-content: center; gap: 50px; }
+    .template-medical nav a { color: var(--color-text); text-decoration: none; font-weight: 500; position: relative; padding: 5px 0; }
+    .template-medical nav a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--color-accent); transition: width 0.3s; }
+    .template-medical nav a:hover::after, .template-medical nav a.active::after { width: 100%; }
+    .template-medical nav a:hover, .template-medical nav a.active { color: var(--color-accent); }
+    .template-medical .hero { padding: 120px 5%; text-align: center; color: var(--color-hero-title); }
+    .template-medical .hero-content { max-width: 700px; margin: 0 auto; }
+    .template-medical .hero h1 { font-size: 3.5rem; font-weight: 300; margin-bottom: 25px; }
+    .template-medical .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; padding: 100px 5%; }
+    .template-medical .service-card { background: var(--color-surface); padding: 50px 30px; border-radius: 25px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); transition: all 0.4s; position: relative; overflow: hidden; }
+    .template-medical .service-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--color-accent), #27ae60); }
+    .template-medical .service-card:hover { transform: translateY(-15px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+    .template-medical .service-icon { font-size: 4rem; color: var(--color-accent); margin-bottom: 25px; }
+    @media (max-width: 768px) {
+        .template-medical .header-top { flex-direction: column; gap: 20px; }
+        .template-medical .contact-info { flex-direction: column; gap: 15px; }
+        .template-medical nav ul { flex-direction: column; gap: 15px; }
+        .template-medical .hero h1 { font-size: 2.5rem; }
+    }
+
+    /* === STYLES TEMPLATE: E-COMMERCE === */
+    .template-ecommerce { background: var(--color-bg); color: var(--color-text); min-height: 100vh; }
+    .template-ecommerce header { background: var(--color-surface); backdrop-filter: blur(20px); padding: 20px 5%; position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color); }
+    .template-ecommerce .header-content { display: flex; justify-content: space-between; align-items: center; }
+    .template-ecommerce .logo { font-size: 2rem; font-weight: 700; background: linear-gradient(45deg, var(--color-accent), #ff6b6b); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .template-ecommerce .header-actions { display: flex; gap: 25px; align-items: center; }
+    .template-ecommerce .header-icons { display: flex; gap: 20px; }
+    .template-ecommerce .header-icon { width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
+    .template-ecommerce .header-icon:hover { background: var(--color-accent); transform: scale(1.1); }
+    .template-ecommerce nav { background: var(--color-surface); padding: 15px 5%; margin-top: 80px; }
+    .template-ecommerce nav ul { list-style: none; display: flex; justify-content: center; gap: 40px; }
+    .template-ecommerce nav a { color: var(--color-text); text-decoration: none; font-weight: 500; position: relative; padding: 5px 0; }
+    .template-ecommerce nav a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--color-accent); transition: width 0.3s; }
+    .template-ecommerce nav a:hover::after, .template-ecommerce nav a.active::after { width: 100%; }
+    .template-ecommerce nav a:hover, .template-ecommerce nav a.active { color: var(--color-accent); }
+    .template-ecommerce .hero { padding: 150px 5% 100px; text-align: center; }
+    .template-ecommerce .hero h1 { font-size: 4rem; font-weight: 300; margin-bottom: 25px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); color: var(--color-hero-title); }
+    .template-ecommerce .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; padding: 100px 5%; background: var(--color-bg); }
+    .template-ecommerce .product-card { background: var(--color-surface); backdrop-filter: blur(20px); border-radius: 20px; overflow: hidden; border: 1px solid var(--border-color); transition: all 0.4s; }
+    .template-ecommerce .product-card:hover { transform: translateY(-15px) scale(1.02); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+    .template-ecommerce .product-image { width: 100%; height: 250px; object-fit: cover; }
+    .template-ecommerce .product-info { padding: 30px; }
+    .template-ecommerce .product-price { font-size: 1.5rem; font-weight: 700; background: linear-gradient(45deg, var(--color-accent), #ff6b6b); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0; }
+    .template-ecommerce .btn-cart { background: linear-gradient(45deg, var(--color-accent), #ff6b6b); color: white; border: none; padding: 15px 30px; border-radius: 30px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: 600; transition: all 0.3s; }
+    .template-ecommerce .btn-cart:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(231,76,60,0.3); }
+    @media (max-width: 768px) {
+        .template-ecommerce .header-content { flex-direction: column; gap: 20px; }
+        .template-ecommerce nav ul { flex-direction: column; gap: 15px; }
+        .template-ecommerce .hero h1 { font-size: 2.5rem; }
+    }
 </style>
 </head>
 <body>
 <div class="container">
-    <div class="customizer">
+    <button class="toggle-btn" id="toggleBtn" title="Masquer/Afficher le dashboard">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <div class="customizer" id="customizer">
+        <div class="resize-handle" id="resizeHandle"></div>
         <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
         
         <div class="tabs" id="tabsContainer">
@@ -143,12 +232,13 @@
             <button class="tab-btn" data-page="galerie">Galerie</button>
             <button class="tab-btn" data-page="temoignages">Témoignages</button>
             <button class="tab-btn" data-page="contact">Contact</button>
+            <button class="tab-btn" data-page="ameliorations">Améliorations</button>
         </div>
         <div id="tabContent"></div>
         <div class="btn-group">
             <button class="btn btn-secondary" id="importJsonBtn" title="Importer une configuration JSON"><i class="fas fa-upload"></i> Importer</button>
             <button class="btn btn-secondary" id="exportJsonBtn" title="Exporter la configuration en JSON"><i class="fas fa-file-code"></i> Exporter</button>
-            <button class="btn" id="requestFeatureBtn" title="Demander une modification ou un nouveau module"><i class="fas fa-lightbulb"></i> Demander un ajout</button>
+
             <button class="btn" id="downloadBtn" title="Télécharger le site complet en HTML"><i class="fas fa-download"></i> Télécharger</button>
             <input type="file" id="importFileInput" accept="application/json" style="display: none;">
         </div>
@@ -162,25 +252,7 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="featureRequestModal">
-    <div class="modal-content">
-        <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
-        <h3>Demander un module ou une modification</h3>
-        <p style="font-size:0.9rem; margin-bottom:15px; color: #555;">Décrivez votre besoin. Votre configuration actuelle sera jointe automatiquement à votre demande pour nous donner le contexte.</p>
-        <form id="featureRequestForm">
-            <div class="form-group">
-                <label for="featureName">Nom du module / de la modification</label>
-                <input type="text" id="featureName" name="nom_de_la_demande" placeholder="Ex: Page Blog, Section 'Notre équipe'..." required>
-            </div>
-            <div class="form-group">
-                <label for="featureDetails">Détails de votre demande</label>
-                <textarea id="featureDetails" name="details_demande" placeholder="Décrivez le plus précisément possible ce que vous souhaitez." required></textarea>
-            </div>
-            
-            <button type="submit" class="btn">Envoyer la demande</button>
-        </form>
-    </div>
-</div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 <script>
@@ -190,7 +262,8 @@ document.addEventListener('DOMContentLoaded', () => {
         general: {
             siteTitle: "Entreprise Pro", headerSubtext: "Excellence & Innovation", theme: "light", templateId: 'artisan',
             colorAccent: '#c0392b', colorHeading: '#2c3e50', colorHeroTitle: '#ffffff', colorHeroSubtitle: '#ffffff', colorText: '#34495e', colorBg: '#ffffff', colorSurface: '#ecf0f1',
-            phone: '01 23 45 67 89', email: 'contact@entreprise.fr', address: '123 Rue de la Réussite, 75001 Paris'
+            phone: '01 23 45 67 89', email: 'contact@entreprise.fr', address: '123 Rue de la Réussite, 75001 Paris',
+            fontFamily: 'system'
         },
         accueil: {
             heroTitle: 'Votre Partenaire de Confiance', heroSubtitle: 'Nous transformons vos idées en succès avec notre expertise et notre engagement.', 
@@ -207,7 +280,11 @@ document.addEventListener('DOMContentLoaded', () => {
             text: 'Fondée en 2008, notre entreprise s\'est imposée comme un leader dans son domaine grâce à notre approche innovante et notre engagement envers l\'excellence. Notre équipe de professionnels expérimentés met tout en œuvre pour dépasser vos attentes.',
             mission: 'Offrir des solutions de qualité supérieure qui créent de la valeur pour nos clients.',
             vision: 'Être reconnu comme le partenaire de référence dans notre secteur.',
-            values: ['Excellence', 'Innovation', 'Intégrité', 'Collaboration']
+            values: ['Excellence', 'Innovation', 'Intégrité', 'Collaboration'],
+            teamImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop',
+            foundedYear: '2008',
+            employeeCount: '50+',
+            projectsCompleted: '1000+'
         },
         services: {
             pageTitle: 'Nos Services',
@@ -216,7 +293,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Conseil Stratégique', desc: 'Analyse approfondie et recommandations personnalisées pour optimiser votre activité.', price: 'À partir de 150€/h', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2070&auto=format&fit=crop', features: ['Audit complet', 'Plan d\'action', 'Suivi personnalisé'] },
                 { name: 'Solutions Techniques', desc: 'Mise en œuvre de solutions innovantes adaptées à vos défis spécifiques.', price: 'Sur devis', image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop', features: ['Technologies avancées', 'Support 24/7', 'Formation incluse'] },
                 { name: 'Accompagnement', desc: 'Support continu pour garantir le succès de vos projets sur le long terme.', price: 'À partir de 800€/mois', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop', features: ['Suivi régulier', 'Rapports détaillés', 'Optimisation continue'] }
-            ]
+            ],
+            heroImage: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop',
+            testimonialText: 'Un service exceptionnel qui a transformé notre entreprise. Résultats au-delà de nos attentes !',
+            testimonialAuthor: 'Sophie Martin, CEO TechCorp'
         },
         galerie: {
             pageTitle: 'Nos Réalisations',
@@ -243,17 +323,40 @@ document.addEventListener('DOMContentLoaded', () => {
             footerText: `© ${new Date().getFullYear()} Entreprise Pro. Tous droits réservés.`,
             social: { facebook: 'https://facebook.com', linkedin: 'https://linkedin.com', twitter: 'https://twitter.com' },
             horaires: 'Lun-Ven: 9h-18h | Sam: 9h-12h'
+        },
+        ameliorations: {
+            modulesAdditionnels: {
+                blog: false,
+                ecommerce: false,
+                reservation: false,
+                newsletter: false,
+                chatbot: false,
+                multilingue: false,
+                faq: false,
+                equipe: false,
+                avis: false,
+                carte: false
+            },
+            commandeSpeciale: '',
+            animations: {
+                parallax: false,
+                fadeIn: false,
+                slideIn: false
+            }
         }
     };
     
     const templates = {
         'artisan': {
             name: 'Artisan Pro',
-            defaults: { colorAccent: '#c0392b', colorHeading: '#2c3e50', colorHeroTitle: '#ffffff', colorHeroSubtitle: '#ffffff', colorText: '#34495e', colorBg: '#ffffff', colorSurface: '#ecf0f1' },
+            defaults: { colorAccent: '#c0392b', colorHeading: '#2c3e50', colorHeroTitle: '#ffffff', colorHeroSubtitle: '#ffffff', colorText: '#34495e', colorBg: '#ffffff', colorSurface: '#ecf0f1', fontFamily: 'system' },
             render: (data, activePage) => `
                 <div class="template-artisan">
                     <header><nav>
-                        <div class="logo-container"><div class="logo">${data.general.siteTitle}</div><div class="subtext">${data.general.headerSubtext}</div></div>
+                        <div class="logo-container">
+                            <div class="logo">${data.general.siteTitle}</div>
+                            <div class="subtext">${data.general.headerSubtext}</div>
+                        </div>
                         <ul>
                             <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Accueil</a></li>
                             <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Services</a></li>
@@ -261,10 +364,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <li><a href="#galerie" data-page="galerie" class="${activePage === 'galerie' ? 'active' : ''}">Galerie</a></li>
                             <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Contact</a></li>
                         </ul>
+                        <div class="contact-info" style="display:flex; gap:15px; font-size:0.9rem; color:var(--color-text);">
+                            <span><i class="fas fa-phone" style="margin-right:5px;"></i>${data.general.phone}</span>
+                            <span><i class="fas fa-envelope" style="margin-right:5px;"></i>${data.general.email}</span>
+                        </div>
                     </nav></header>
                     <main>
                         <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
-                            <section class="hero" style="background-image: url('${data.accueil.heroImage}');"><div class="hero-content"><h1>${data.accueil.heroTitle}</h1><p>${data.accueil.heroSubtitle}</p><a href="${data.accueil.ctaLink}" class="btn cta-btn">${data.accueil.ctaText}</a></div></section>
+                            <section class="hero" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${data.accueil.heroImage}');"><div class="hero-content"><h1>${data.accueil.heroTitle}</h1><p style="font-size:1.2rem; margin:20px 0 30px;">${data.accueil.heroSubtitle}</p><div style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;"><a href="${data.accueil.ctaLink}" class="btn cta-btn">${data.accueil.ctaText}</a><a href="#contact" class="btn" style="background:transparent; border:2px solid white;">Nous contacter</a></div></div></section>
                             <section class="section"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
                             <section class="section section-alt"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto; font-size:1.1rem;">${data.apropos.text}</p></section>
                             <section class="section testimonials"><h2>${data.temoignages.title}</h2><div class="card-grid">${data.temoignages.items.map(t => `<div class="card testimonial-card"><p>"${t.text}"</p><div class="author">- ${t.author}<br><small>${t.company}</small></div></div>`).join('')}</div></section>
@@ -319,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         'corporate': {
             name: 'Corporate Moderne',
-            defaults: { colorAccent: '#0052CC', colorHeading: '#172B4D', colorText: '#42526E', colorBg: '#FFFFFF', colorSurface: '#F4F5F7' },
+            defaults: { colorAccent: '#0052CC', colorHeading: '#172B4D', colorText: '#42526E', colorBg: '#FFFFFF', colorSurface: '#F4F5F7', fontFamily: 'roboto' },
             render: (data, activePage) => `
                 <div class="template-corporate">
                     <header>
@@ -335,7 +442,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <main>
                         <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
                             <section class="hero">
-                                <div class="hero-text"><h1>${data.accueil.heroTitle}</h1><p>${data.accueil.heroSubtitle}</p><a href="${data.accueil.ctaLink}" class="btn cta-btn">${data.accueil.ctaText}</a></div>
+                                <div class="hero-text">
+                                    <div style="background: var(--color-accent); color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; margin-bottom: 20px; font-size: 0.9rem; font-weight: 500;">EXCELLENCE & INNOVATION</div>
+                                    <h1>${data.accueil.heroTitle}</h1>
+                                    <p>${data.accueil.heroSubtitle}</p>
+                                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                                        <a href="${data.accueil.ctaLink}" class="btn cta-btn">${data.accueil.ctaText}</a>
+                                        <a href="#contact" class="btn" style="background: transparent; color: var(--color-accent); border: 2px solid var(--color-accent);">Demander un devis</a>
+                                    </div>
+                                </div>
                                 <img class="hero-image" src="${data.accueil.heroImage}" alt="Hero Image">
                             </section>
                             <section class="section"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
@@ -391,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         'portfolio': {
             name: 'Portfolio Créatif',
-            defaults: { colorAccent: '#E91E63', colorHeading: '#212121', colorText: '#616161', colorBg: '#FFFFFF', colorSurface: '#FAFAFA' },
+            defaults: { colorAccent: '#E91E63', colorHeading: '#212121', colorText: '#616161', colorBg: '#FFFFFF', colorSurface: '#FAFAFA', fontFamily: 'playfair' },
             render: (data, activePage) => `
                 <div class="template-portfolio">
                      <header>
@@ -447,6 +562,110 @@ document.addEventListener('DOMContentLoaded', () => {
                     </main>
                     <footer><p>${data.contact.footerText}</p></footer>
                 </div>`
+        },
+
+        'medical': {
+            name: 'Cabinet Médical',
+            defaults: { colorAccent: '#2ecc71', colorHeading: '#2c3e50', colorText: '#34495e', colorBg: '#f8fdff', colorSurface: '#ffffff', fontFamily: 'roboto' },
+            render: (data, activePage) => `
+                <div class="template-medical">
+                    <header>
+                        <div class="header-top">
+                            <div class="logo">${data.general.siteTitle}</div>
+                            <div class="contact-info">
+                                <span><i class="fas fa-phone"></i> ${data.general.phone}</span>
+                                <span><i class="fas fa-clock"></i> ${data.contact.horaires}</span>
+                            </div>
+                        </div>
+                        <nav><ul>
+                            <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Accueil</a></li>
+                            <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Spécialités</a></li>
+                            <li><a href="#apropos" data-page="apropos" class="${activePage === 'apropos' ? 'active' : ''}">Le Docteur</a></li>
+                            <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Rendez-vous</a></li>
+                        </ul></nav>
+                    </header>
+                    <main>
+                        <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
+                            <section class="hero" style="background: linear-gradient(135deg, var(--color-accent-overlay), var(--color-accent-overlay)), url('${data.accueil.heroImage}'); background-size: cover; background-position: center;">
+                                <div class="hero-content">
+                                    <h1 style="font-size: 2.5rem; margin-bottom: 20px;">${data.accueil.heroTitle}</h1>
+                                    <p style="font-size: 1.2rem; margin-bottom: 30px;">${data.accueil.heroSubtitle}</p>
+                                    <a href="${data.accueil.ctaLink}" class="btn" style="background: white; color: var(--color-accent); padding: 15px 30px;">${data.accueil.ctaText}</a>
+                                </div>
+                            </section>
+                            <section class="section"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'services' ? 'active' : ''}" id="page-services">
+                            <section class="section"><h2>${data.services.pageTitle}</h2><div class="services-grid">${data.services.items.map(i => `<div class="service-card"><div class="service-icon"><i class="fas fa-stethoscope"></i></div><h3>${i.name}</h3><p>${i.desc}</p></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'apropos' ? 'active' : ''}" id="page-apropos">
+                            <section class="section"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto 40px; font-size:1.1rem;">${data.apropos.text}</p>
+                                <div class="features-grid">
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-bullseye"></i></div><h3>Notre Mission</h3><p>${data.apropos.mission}</p></div>
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-eye"></i></div><h3>Notre Vision</h3><p>${data.apropos.vision}</p></div>
+                                </div>
+                                <div style="text-align:center; margin-top:40px;"><h3>Nos Valeurs</h3><div style="display:flex; justify-content:center; gap:30px; margin-top:20px; flex-wrap:wrap;">${data.apropos.values.map(v => `<span style="background:var(--color-accent); color:white; padding:10px 20px; border-radius:25px;">${v}</span>`).join('')}</div></div>
+                                <div style="text-align:center; margin-top:40px;"><img src="${data.apropos.teamImage}" alt="Notre équipe" style="max-width:600px; width:100%; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.1);"></div>
+                            </section>
+                        </div>
+                        <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><div style="max-width:600px; margin:0 auto; text-align:center;"><p style="margin-bottom:30px;">${data.contact.introText}</p><div style="background:var(--color-surface); padding:30px; border-radius:10px;"><h3>Informations pratiques</h3><p style="margin:15px 0;"><i class="fas fa-map-marker-alt" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.address}</p><p style="margin:15px 0;"><i class="fas fa-phone" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.phone}</p><p style="margin:15px 0;"><i class="fas fa-envelope" style="color:var(--color-accent); margin-right:10px;"></i>${data.general.email}</p><p><i class="fas fa-clock" style="color:var(--color-accent); margin-right:10px;"></i>${data.contact.horaires}</p></div></div></section>
+                        </div>
+                    </main>
+                    <footer style="background: var(--color-surface); text-align: center; padding: 30px;"><div class="social-links" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" aria-label="${k}" style="color: var(--color-accent); font-size: 1.5rem; transition: color 0.3s;"><i class="fab fa-${k}"></i></a>`).join('')}</div><p>${data.contact.footerText}</p></footer>
+                </div>`
+        },
+        'ecommerce': {
+            name: 'Boutique E-commerce',
+            defaults: { colorAccent: '#e74c3c', colorHeading: '#ffffff', colorText: '#ffffff', colorBg: '#0a0a0a', colorSurface: '#1a1a1a', fontFamily: 'montserrat' },
+            render: (data, activePage) => `
+                <div class="template-ecommerce">
+                    <header>
+                        <div class="header-content">
+                            <div class="logo">${data.general.siteTitle}</div>
+                            <div class="header-actions">
+                                <div class="header-icons">
+                                    <div class="header-icon"><i class="fas fa-user"></i></div>
+                                    <div class="header-icon"><i class="fas fa-shopping-cart"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                    <nav><ul>
+                        <li><a href="#accueil" data-page="accueil" class="${activePage === 'accueil' ? 'active' : ''}">Accueil</a></li>
+                        <li><a href="#services" data-page="services" class="${activePage === 'services' ? 'active' : ''}">Produits</a></li>
+                        <li><a href="#apropos" data-page="apropos" class="${activePage === 'apropos' ? 'active' : ''}">Notre Marque</a></li>
+                        <li><a href="#contact" data-page="contact" class="${activePage === 'contact' ? 'active' : ''}">Contact</a></li>
+                    </ul></nav>
+                    <main>
+                        <div class="page-content ${activePage === 'accueil' ? 'active' : ''}" id="page-accueil">
+                            <section class="hero" style="background: linear-gradient(135deg, var(--color-accent-overlay), var(--color-accent-overlay)), url('${data.accueil.heroImage}'); background-size: cover; background-position: center;">
+                                <div class="hero-content">
+                                    <h1 style="font-size: 2.8rem; margin-bottom: 20px;">${data.accueil.heroTitle}</h1>
+                                    <p style="font-size: 1.2rem; margin-bottom: 30px;">${data.accueil.heroSubtitle}</p>
+                                    <a href="${data.accueil.ctaLink}" class="btn" style="background: white; color: var(--color-accent); padding: 15px 30px; font-weight: bold;">${data.accueil.ctaText}</a>
+                                </div>
+                            </section>
+                            <section class="section"><div class="stats-grid">${data.accueil.stats.map(s => `<div class="stat-item"><div class="stat-number">${s.number}</div><div>${s.label}</div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'services' ? 'active' : ''}" id="page-services">
+                            <section class="section"><h2>${data.services.pageTitle}</h2><div class="products-grid">${data.services.items.map(i => `<div class="product-card"><img src="${i.image}" alt="${i.name}" class="product-image"><div class="product-info"><h3>${i.name}</h3><p>${i.desc}</p><div class="product-price">${i.price}</div><button class="btn-cart">Ajouter au panier</button></div></div>`).join('')}</div></section>
+                        </div>
+                        <div class="page-content ${activePage === 'apropos' ? 'active' : ''}" id="page-apropos">
+                            <section class="section"><h2>${data.apropos.title}</h2><p style="text-align:center; max-width:800px; margin:0 auto 40px; font-size:1.1rem;">${data.apropos.text}</p>
+                                <div class="features-grid">
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-bullseye"></i></div><h3>Notre Mission</h3><p>${data.apropos.mission}</p></div>
+                                    <div class="feature-item"><div class="feature-icon"><i class="fas fa-eye"></i></div><h3>Notre Vision</h3><p>${data.apropos.vision}</p></div>
+                                </div>
+                                <div style="text-align:center; margin-top:40px;"><h3>Nos Valeurs</h3><div style="display:flex; justify-content:center; gap:30px; margin-top:20px; flex-wrap:wrap;">${data.apropos.values.map(v => `<span style="background:var(--color-accent); color:white; padding:10px 20px; border-radius:25px;">${v}</span>`).join('')}</div></div>
+                            </section>
+                        </div>
+                        <div class="page-content ${activePage === 'contact' ? 'active' : ''}" id="page-contact">
+                            <section class="section"><h2>${data.contact.pageTitle}</h2><div style="max-width:600px; margin:0 auto; text-align:center;"><p style="margin-bottom:30px;">${data.contact.introText}</p><div style="background:rgba(231,76,60,0.1); padding:30px; border-radius:15px;"><p style="margin:15px 0; color:var(--color-accent);"><i class="fas fa-map-marker-alt" style="margin-right:10px;"></i>${data.general.address}</p><p style="margin:15px 0; color:var(--color-accent);"><i class="fas fa-envelope" style="margin-right:10px;"></i>${data.general.email}</p><p style="margin:15px 0; color:var(--color-accent);"><i class="fas fa-phone" style="margin-right:10px;"></i>${data.general.phone}</p><p style="color:var(--color-accent);"><i class="fas fa-clock" style="margin-right:10px;"></i>${data.contact.horaires}</p></div></div></section>
+                        </div>
+                    </main>
+                    <footer style="background: var(--color-surface); text-align: center; padding: 30px;"><div class="social-links" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">${Object.entries(data.contact.social).filter(([_, v]) => v).map(([k, v]) => `<a href="${v}" target="_blank" aria-label="${k}" style="color: #666; font-size: 1.5rem; transition: color 0.3s;"><i class="fab fa-${k}"></i></a>`).join('')}</div><p style="color: #666;">${data.contact.footerText}</p></footer>
+                </div>`
         }
     };
 
@@ -454,32 +673,90 @@ document.addEventListener('DOMContentLoaded', () => {
         tabs: document.querySelectorAll('.tab-btn'), tabContent: document.getElementById('tabContent'), preview: document.getElementById('websitePreview'),
         downloadBtn: document.getElementById('downloadBtn'), exportJsonBtn: document.getElementById('exportJsonBtn'),
         importJsonBtn: document.getElementById('importJsonBtn'), importFileInput: document.getElementById('importFileInput'),
-        requestFeatureBtn: document.getElementById('requestFeatureBtn'),
-        modal: document.getElementById('featureRequestModal'),
-        modalCloseBtn: document.getElementById('modalCloseBtn'),
-        featureRequestForm: document.getElementById('featureRequestForm'),
+
         jsonConfigInput: document.getElementById('jsonConfigInput'),
+        toggleBtn: document.getElementById('toggleBtn'),
+        customizer: document.getElementById('customizer'),
+        resizeHandle: document.getElementById('resizeHandle')
     };
     let currentCustomizerPage = 'general', currentPreviewPage = 'accueil';
+    let updateTimeout = null;
 
     const updateState = (path, value) => {
         path.split('.').reduce((acc, key, i, arr) => {
-            if (i === arr.length - 1) acc[key] = value;
+            if (i === arr.length - 1) {
+                // Traitement spécial pour les valeurs
+                if (path === 'apropos.values' && typeof value === 'string') {
+                    acc[key] = value.split(',').map(v => v.trim()).filter(v => v);
+                } else {
+                    acc[key] = value;
+                }
+            }
             return acc[key] || {};
         }, websiteData);
         
-        if (path.startsWith('general.color') || path === 'general.theme') applyTheme();
-        renderPreview(currentPreviewPage);
+        if (path.startsWith('general.color') || path === 'general.theme' || path.startsWith('general.font')) applyTheme();
+        
+        // Debounce pour éviter les flashs
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(() => {
+            renderPreview(currentPreviewPage);
+        }, 500);
     };
     
     const updateTabsForTemplate = (templateId) => {
         const tabsContainer = document.getElementById('tabsContainer');
         const accueilTab = tabsContainer.querySelector('[data-page="accueil"]');
+        const servicesTab = tabsContainer.querySelector('[data-page="services"]');
+        const aproposTab = tabsContainer.querySelector('[data-page="apropos"]');
+        const galerieTab = tabsContainer.querySelector('[data-page="galerie"]');
+        const temoignagesTab = tabsContainer.querySelector('[data-page="temoignages"]');
+        const contactTab = tabsContainer.querySelector('[data-page="contact"]');
         
-        if (templateId === 'portfolio') {
-            accueilTab.textContent = 'Portfolio';
-        } else {
+        // Reset all tabs to visible and default text
+        [accueilTab, servicesTab, aproposTab, galerieTab, temoignagesTab, contactTab].forEach(tab => {
+            if (tab) tab.style.display = 'block';
+        });
+        
+        if (templateId === 'artisan') {
+            // Template 1: OK par défaut
             accueilTab.textContent = 'Accueil';
+            servicesTab.textContent = 'Services';
+            aproposTab.textContent = 'À Propos';
+            galerieTab.textContent = 'Galerie';
+            contactTab.textContent = 'Contact';
+        } else if (templateId === 'corporate') {
+            // Template 2: galerie → réalisations, enlever témoignages
+            accueilTab.textContent = 'Accueil';
+            servicesTab.textContent = 'Services';
+            aproposTab.textContent = 'À Propos';
+            galerieTab.textContent = 'Réalisations';
+            contactTab.textContent = 'Contact';
+            if (temoignagesTab) temoignagesTab.style.display = 'none';
+        } else if (templateId === 'portfolio') {
+            // Template 3: enlever galerie et témoignages
+            accueilTab.textContent = 'Portfolio';
+            servicesTab.textContent = 'Services';
+            aproposTab.textContent = 'À Propos';
+            contactTab.textContent = 'Contact';
+            if (galerieTab) galerieTab.style.display = 'none';
+            if (temoignagesTab) temoignagesTab.style.display = 'none';
+        } else if (templateId === 'medical') {
+            // Template 5: à propos → le docteur, contact → rdv, pas d'équipe ni témoignages
+            accueilTab.textContent = 'Accueil';
+            servicesTab.textContent = 'Spécialités';
+            aproposTab.textContent = 'Le Docteur';
+            contactTab.textContent = 'RDV';
+            if (galerieTab) galerieTab.style.display = 'none';
+            if (temoignagesTab) temoignagesTab.style.display = 'none';
+        } else if (templateId === 'ecommerce') {
+            // Template 6: à propos → notre marque, pas de galerie ni témoignages
+            accueilTab.textContent = 'Accueil';
+            servicesTab.textContent = 'Produits';
+            aproposTab.textContent = 'Notre Marque';
+            contactTab.textContent = 'Contact';
+            if (galerieTab) galerieTab.style.display = 'none';
+            if (temoignagesTab) temoignagesTab.style.display = 'none';
         }
         
         // Refresh DOM.tabs reference
@@ -493,7 +770,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const createFormGroup = (path, label, type = 'text', options = {}) => {
-        const value = path.split('.').reduce((acc, key) => acc && acc[key], websiteData) ?? '';
+        let value = path.split('.').reduce((acc, key) => acc && acc[key], websiteData) ?? '';
+        
+        // Traitement spécial pour les valeurs (array vers string)
+        if (path === 'apropos.values' && Array.isArray(value)) {
+            value = value.join(', ');
+        }
+        
         const group = document.createElement('div');
         group.className = `form-group ${type === 'color' ? 'color-input' : ''}`;
         
@@ -565,6 +848,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 addField('general.colorText', 'Texte', 'color');
                 addField('general.colorBg', 'Arrière-plan', 'color'); 
                 addField('general.colorSurface', 'Surfaces', 'color');
+                addDivider();
+                
+                // Thème spécial pour médical et e-commerce
+                if (websiteData.general.templateId === 'medical' || websiteData.general.templateId === 'ecommerce') {
+                    addSubheading('Thème');
+                    const themeChoices = [
+                        { value: 'light', text: 'Clair' },
+                        { value: 'dark', text: 'Sombre' }
+                    ];
+                    addField('general.theme', 'Mode d\'affichage', 'select', { choices: themeChoices });
+                    addDivider();
+                }
+                
+                addSubheading('Typographie');
+                const fontChoices = [
+                    { value: 'system', text: 'Système (défaut)' },
+                    { value: 'roboto', text: 'Roboto (moderne)' },
+                    { value: 'playfair', text: 'Playfair (élégant)' },
+                    { value: 'montserrat', text: 'Montserrat (clean)' }
+                ];
+                addField('general.fontFamily', 'Police de caractères', 'select', { choices: fontChoices });
                 break;
             case 'accueil':
                 if (websiteData.general.templateId === 'portfolio') {
@@ -592,21 +896,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 break;
             case 'services':
-                addField('services.pageTitle', 'Titre de la page');
-                addField('services.intro', 'Texte d\'introduction', 'textarea');
-                websiteData.services.items.forEach((_, i) => { 
-                    addDivider(); addSubheading(`Service ${i + 1}`);
-                    addField(`services.items.${i}.name`, 'Nom du service'); 
-                    addField(`services.items.${i}.desc`, 'Description', 'textarea');
-                    addField(`services.items.${i}.price`, 'Prix'); 
-                    addField(`services.items.${i}.image`, 'Image (URL)');
-                });
+                const currentTemplate = websiteData.general.templateId;
+                if (currentTemplate === 'medical') {
+                    addField('services.pageTitle', 'Nos spécialités');
+                    websiteData.services.items.forEach((_, i) => { 
+                        addDivider(); addSubheading(`Spécialité ${i + 1}`);
+                        addField(`services.items.${i}.name`, 'Nom de la spécialité'); 
+                        addField(`services.items.${i}.desc`, 'Description', 'textarea');
+                    });
+                } else if (currentTemplate === 'ecommerce') {
+                    addField('services.pageTitle', 'Nos produits');
+                    websiteData.services.items.forEach((_, i) => { 
+                        addDivider(); addSubheading(`Produit ${i + 1}`);
+                        addField(`services.items.${i}.name`, 'Nom du produit'); 
+                        addField(`services.items.${i}.desc`, 'Description du produit', 'textarea');
+                        addField(`services.items.${i}.price`, 'Prix'); 
+                        addField(`services.items.${i}.image`, 'Image du produit (URL)');
+                    });
+                } else {
+                    addField('services.pageTitle', 'Titre de la page');
+                    addField('services.intro', 'Texte d\'introduction', 'textarea');
+                    addField('services.heroImage', 'Image de fond services (URL)');
+                    addField('services.testimonialText', 'Témoignage', 'textarea');
+                    addField('services.testimonialAuthor', 'Auteur du témoignage');
+                    websiteData.services.items.forEach((_, i) => { 
+                        addDivider(); addSubheading(`Service ${i + 1}`);
+                        addField(`services.items.${i}.name`, 'Nom du service'); 
+                        addField(`services.items.${i}.desc`, 'Description', 'textarea');
+                        addField(`services.items.${i}.price`, 'Prix'); 
+                        addField(`services.items.${i}.image`, 'Image (URL)');
+                    });
+                }
                 break;
             case 'apropos':
-                addField('apropos.title', 'Titre de la section');
-                addField('apropos.text', 'Présentation de l\'entreprise', 'textarea');
-                addField('apropos.mission', 'Notre mission', 'textarea');
-                addField('apropos.vision', 'Notre vision', 'textarea');
+                const templateType = websiteData.general.templateId;
+                if (templateType === 'medical') {
+                    addField('apropos.title', 'Le Docteur');
+                    addField('apropos.text', 'Présentation du praticien', 'textarea');
+                    addField('apropos.mission', 'Approche médicale', 'textarea');
+                    addField('apropos.vision', 'Vision des soins', 'textarea');
+                    addField('apropos.values', 'Valeurs médicales (séparées par des virgules)');
+                    addField('apropos.teamImage', 'Photo du cabinet/équipe (URL)');
+                } else if (templateType === 'ecommerce') {
+                    addField('apropos.title', 'Notre marque');
+                    addField('apropos.text', 'Histoire de la marque', 'textarea');
+                    addField('apropos.mission', 'Notre mission commerciale', 'textarea');
+                    addField('apropos.vision', 'Notre vision business', 'textarea');
+                    addField('apropos.values', 'Nos valeurs (séparées par des virgules)');
+                } else {
+                    addField('apropos.title', 'Titre de la section');
+                    addField('apropos.text', 'Présentation de l\'entreprise', 'textarea');
+                    addField('apropos.mission', 'Notre mission', 'textarea');
+                    addField('apropos.vision', 'Notre vision', 'textarea');
+                    addField('apropos.teamImage', 'Image de l\'équipe (URL)');
+                    addField('apropos.foundedYear', 'Année de création');
+                    addField('apropos.employeeCount', 'Nombre d\'employés');
+                    addField('apropos.projectsCompleted', 'Projets réalisés');
+                }
                 break;
             case 'galerie':
                 addField('galerie.pageTitle', 'Titre de la page');
@@ -628,10 +974,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 break;
             case 'contact':
-                addField('contact.pageTitle', 'Titre de la page'); 
-                addField('contact.introText', 'Texte d\'introduction', 'textarea');
-                addField('contact.formTitle', 'Titre du formulaire');
-                addField('contact.horaires', 'Horaires d\'ouverture');
+                const contactTemplateId = websiteData.general.templateId;
+                if (contactTemplateId === 'medical') {
+                    addField('contact.pageTitle', 'Prendre rendez-vous');
+                    addField('contact.introText', 'Message pour les patients', 'textarea');
+                    addField('contact.horaires', 'Horaires de consultation');
+                    addDivider();
+                    addSubheading('Informations pratiques');
+                    addField('general.address', 'Adresse du cabinet', 'textarea');
+                    addField('general.phone', 'Téléphone');
+                    addField('general.email', 'Email');
+                } else if (contactTemplateId === 'ecommerce') {
+                    addField('contact.pageTitle', 'Nous contacter');
+                    addField('contact.introText', 'Message de contact', 'textarea');
+                    addField('contact.horaires', 'Horaires service client');
+                    addDivider();
+                    addSubheading('Service client');
+                    addField('general.address', 'Adresse', 'textarea');
+                    addField('general.phone', 'Téléphone');
+                    addField('general.email', 'Email support');
+                } else {
+                    addField('contact.pageTitle', 'Titre de la page');
+                    addField('contact.introText', 'Texte d\'introduction', 'textarea');
+                    addField('contact.formTitle', 'Titre du formulaire');
+                    addField('contact.horaires', 'Horaires d\'ouverture');
+                }
                 addDivider();
                 addSubheading('Réseaux Sociaux');
                 addField('contact.social.facebook', 'Facebook (URL)'); 
@@ -639,6 +1006,67 @@ document.addEventListener('DOMContentLoaded', () => {
                 addField('contact.social.twitter', 'Twitter (URL)');
                 addDivider();
                 addField('contact.footerText', 'Texte du pied de page');
+                break;
+            case 'ameliorations':
+                addSubheading('Modules Additionnels');
+                const modules = [
+                    { key: 'blog', label: 'Blog / Articles' },
+                    { key: 'ecommerce', label: 'E-commerce / Boutique' },
+                    { key: 'reservation', label: 'Système de réservation' },
+                    { key: 'newsletter', label: 'Newsletter / Mailing' },
+                    { key: 'chatbot', label: 'Chat en ligne' },
+                    { key: 'multilingue', label: 'Site multilingue' },
+                    { key: 'faq', label: 'FAQ / Questions fréquentes' },
+                    { key: 'equipe', label: 'Page équipe' },
+                    { key: 'avis', label: 'Système d\'avis clients' },
+                    { key: 'carte', label: 'Carte interactive' }
+                ];
+                modules.forEach(module => {
+                    const group = document.createElement('div');
+                    group.className = 'checkbox-group';
+                    const checked = websiteData.ameliorations.modulesAdditionnels[module.key] ? 'checked' : '';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `ameliorations.modulesAdditionnels.${module.key}`;
+                    checkbox.checked = websiteData.ameliorations.modulesAdditionnels[module.key];
+                    const label = document.createElement('label');
+                    label.htmlFor = checkbox.id;
+                    label.textContent = module.label;
+                    label.style.cursor = 'pointer';
+                    group.appendChild(checkbox);
+                    group.appendChild(label);
+                    checkbox.addEventListener('change', e => {
+                        updateState(`ameliorations.modulesAdditionnels.${module.key}`, e.target.checked);
+                    });
+                    fragment.appendChild(group);
+                });
+                addDivider();
+                addSubheading('Animations');
+                const animations = [
+                    { key: 'parallax', label: 'Effet parallax' },
+                    { key: 'fadeIn', label: 'Apparition en fondu' },
+                    { key: 'slideIn', label: 'Glissement latéral' }
+                ];
+                animations.forEach(anim => {
+                    const group = document.createElement('div');
+                    group.className = 'checkbox-group';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `ameliorations.animations.${anim.key}`;
+                    checkbox.checked = websiteData.ameliorations.animations[anim.key];
+                    const label = document.createElement('label');
+                    label.htmlFor = checkbox.id;
+                    label.textContent = anim.label;
+                    label.style.cursor = 'pointer';
+                    group.appendChild(checkbox);
+                    group.appendChild(label);
+                    checkbox.addEventListener('change', e => {
+                        updateState(`ameliorations.animations.${anim.key}`, e.target.checked);
+                    });
+                    fragment.appendChild(group);
+                });
+                addDivider();
+                addField('ameliorations.commandeSpeciale', 'Commande spéciale', 'textarea', { placeholder: 'Décrivez vos besoins spécifiques...' });
                 break;
         }
         DOM.tabContent.appendChild(fragment);
@@ -649,30 +1077,71 @@ document.addEventListener('DOMContentLoaded', () => {
         const templateId = websiteData.general.templateId;
         const activeTemplate = templates[templateId] || templates['artisan'];
         
-        DOM.preview.innerHTML = activeTemplate.render(websiteData, activePage);
+        const newContent = activeTemplate.render(websiteData, activePage);
+        const previewContainer = document.querySelector('.preview-container');
         
-        DOM.preview.querySelectorAll('nav a, .cta-btn').forEach(link => {
-            link.addEventListener('click', e => {
-                const href = link.getAttribute('href');
-                if (href && href.startsWith('#')) {
-                    e.preventDefault();
-                    const targetPage = href.replace('#', '');
-                    renderPreview(targetPage);
-                }
-            });
-        });
+        // Transition douce avec fade
+        if (DOM.preview.innerHTML !== newContent) {
+            previewContainer.style.opacity = '0.3';
+            
+            setTimeout(() => {
+                DOM.preview.innerHTML = newContent;
+                
+                DOM.preview.querySelectorAll('nav a, .cta-btn').forEach(link => {
+                    link.addEventListener('click', e => {
+                        const href = link.getAttribute('href');
+                        if (href && href.startsWith('#')) {
+                            e.preventDefault();
+                            const targetPage = href.replace('#', '');
+                            renderPreview(targetPage);
+                        }
+                    });
+                });
+                
+                previewContainer.style.opacity = '1';
+            }, 200);
+        }
+    };
+    
+    const hexToRgba = (hex, alpha) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     };
     
     const applyTheme = () => {
-        const { theme, ...colors } = websiteData.general;
+        const { theme, fontFamily, ...colors } = websiteData.general;
         const root = document.documentElement;
         root.className = theme === 'dark' ? 'dark-theme' : '';
         Object.entries(colors).forEach(([key, value]) => {
             if (key.startsWith('color')) {
                 const cssVar = `--${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
                 root.style.setProperty(cssVar, value);
+                // Créer des versions rgba de la couleur principale
+                if (key === 'colorAccent') {
+                    root.style.setProperty('--color-accent-overlay', hexToRgba(value, 0.9));
+                }
             }
         });
+        
+        // Appliquer la police
+        const fontMap = {
+            'system': 'var(--font-main)',
+            'roboto': '"Roboto", sans-serif',
+            'playfair': '"Playfair Display", serif',
+            'montserrat': '"Montserrat", sans-serif'
+        };
+        root.style.setProperty('--font-main', fontMap[fontFamily] || fontMap.system);
+        
+        // Charger les polices Google si nécessaire
+        if (fontFamily !== 'system') {
+            const link = document.getElementById('google-fonts') || document.createElement('link');
+            link.id = 'google-fonts';
+            link.rel = 'stylesheet';
+            link.href = `https://fonts.googleapis.com/css2?family=${fontFamily === 'roboto' ? 'Roboto:wght@300;400;500;700' : fontFamily === 'playfair' ? 'Playfair+Display:wght@400;500;700' : 'Montserrat:wght@300;400;500;700'}&display=swap`;
+            document.head.appendChild(link);
+        }
     };
 
     const exportJson = () => {
@@ -759,10 +1228,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     <\/script>
 </body></html>`;
-        const blob = new Blob([fullHtml.trim()], { type: 'text/html' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'index.html';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(a.href);
+        
+        // Télécharger le HTML
+        const htmlBlob = new Blob([fullHtml.trim()], { type: 'text/html' });
+        const htmlLink = document.createElement('a');
+        htmlLink.href = URL.createObjectURL(htmlBlob);
+        htmlLink.download = 'index.html';
+        document.body.appendChild(htmlLink);
+        htmlLink.click();
+        document.body.removeChild(htmlLink);
+        URL.revokeObjectURL(htmlLink.href);
+        
+        // Télécharger le JSON de configuration
+        const jsonString = JSON.stringify(websiteData, null, 2);
+        const jsonBlob = new Blob([jsonString], { type: 'application/json' });
+        const jsonLink = document.createElement('a');
+        jsonLink.href = URL.createObjectURL(jsonBlob);
+        jsonLink.download = 'config-site.json';
+        document.body.appendChild(jsonLink);
+        jsonLink.click();
+        document.body.removeChild(jsonLink);
+        URL.revokeObjectURL(jsonLink.href);
     };
 
     DOM.tabs.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.page)));
@@ -771,59 +1257,46 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.importJsonBtn.addEventListener('click', () => DOM.importFileInput.click());
     DOM.importFileInput.addEventListener('change', importJson);
     
-    DOM.requestFeatureBtn.addEventListener('click', () => {
-        DOM.modal.classList.add('visible');
+    // Gestion du toggle dashboard
+    DOM.toggleBtn.addEventListener('click', () => {
+        DOM.customizer.classList.toggle('collapsed');
+        DOM.toggleBtn.classList.toggle('collapsed');
+        const icon = DOM.toggleBtn.querySelector('i');
+        icon.className = DOM.customizer.classList.contains('collapsed') ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+        
+        // Ajuster la prévisualisation
+        const preview = document.querySelector('.preview');
+        if (DOM.customizer.classList.contains('collapsed')) {
+            preview.style.paddingLeft = '60px';
+            preview.style.paddingRight = '60px';
+        } else {
+            preview.style.paddingLeft = '20px';
+            preview.style.paddingRight = '20px';
+        }
     });
-    DOM.modalCloseBtn.addEventListener('click', () => DOM.modal.classList.remove('visible'));
-    DOM.modal.addEventListener('click', (e) => { if (e.target === DOM.modal) DOM.modal.classList.remove('visible'); });
     
-    DOM.featureRequestForm.addEventListener('submit', async (e) => {
+    // Gestion du redimensionnement
+    let isResizing = false;
+    DOM.resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.addEventListener('mousemove', handleResize);
+        document.addEventListener('mouseup', stopResize);
+    });
+    
+    function handleResize(e) {
+        if (!isResizing) return;
+        const newWidth = Math.min(Math.max(e.clientX, 300), 600);
+        DOM.customizer.style.width = newWidth + 'px';
+        DOM.toggleBtn.style.left = newWidth + 'px';
         e.preventDefault();
-        const nom = document.getElementById('featureName').value;
-        const details = document.getElementById('featureDetails').value;
-        
-        const formData = {
-            nom: nom,
-            details: details,
-            configuration: JSON.stringify(websiteData),
-            timestamp: new Date().toISOString()
-        };
-        
-        // Envoyer directement par email
-        const form = document.createElement('form');
-        form.action = 'https://formsubmit.co/c8334b6b09290863f450664541c600cd';
-        form.method = 'POST';
-        form.style.display = 'none';
-        
-        const inputs = [
-            { name: '_subject', value: `Nouvelle demande: ${nom}` },
-            { name: '_captcha', value: 'false' },
-            { name: '_next', value: 'data:text/html,<h2>Votre demande a été envoyée avec succès!</h2><p>Nous vous répondrons rapidement.</p>' },
-            { name: 'nom_demande', value: nom },
-            { name: 'details', value: details },
-            { name: 'site_title', value: websiteData.general.siteTitle },
-            { name: 'template', value: websiteData.general.templateId },
-            { name: 'email_client', value: websiteData.general.email },
-            { name: 'phone_client', value: websiteData.general.phone },
-            { name: 'timestamp', value: formData.timestamp }
-        ];
-        
-        inputs.forEach(({ name, value }) => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = name;
-            input.value = value;
-            form.appendChild(input);
-        });
-        
-        document.body.appendChild(form);
-        form.submit();
-        
-        DOM.modal.classList.remove('visible');
-        document.getElementById('featureName').value = '';
-        document.getElementById('featureDetails').value = '';
-    });
+    }
     
+    function stopResize() {
+        isResizing = false;
+        document.removeEventListener('mousemove', handleResize);
+        document.removeEventListener('mouseup', stopResize);
+    }
+
     updateTabsForTemplate(websiteData.general.templateId);
     applyTheme();
     switchTab(currentCustomizerPage);
